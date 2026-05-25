@@ -45,8 +45,6 @@ class ConversationManager @Inject constructor(
 ) {
     private companion object {
         const val TAG = "EnglishCarConversation"
-        const val ERROR_TOO_MANY_REQUESTS = 10
-        const val ERROR_LANGUAGE_UNAVAILABLE = 11
         const val MAX_PAUSED_COMMAND_ATTEMPTS = 12
     }
 
@@ -457,18 +455,10 @@ class ConversationManager @Inject constructor(
             }
             return
         }
-        if (code == ERROR_LANGUAGE_UNAVAILABLE && isSessionActive) {
-            scope.launch {
-                delay(retryDelayMs() + 1_500L)
-                if (isSessionActive && !pausedCommandMode) listen(resetInactivityTimer = false)
-            }
-            return
-        }
         if (
             isSessionActive &&
             !pausedCommandMode &&
-            (code == android.speech.SpeechRecognizer.ERROR_NO_MATCH ||
-                code == android.speech.SpeechRecognizer.ERROR_SPEECH_TIMEOUT)
+            code == SpeechRecognitionClient.ERROR_NO_MATCH
         ) {
             scope.launch {
                 delay(450L)
@@ -599,25 +589,15 @@ class ConversationManager @Inject constructor(
     }
 
     private fun shouldRetry(code: Int): Boolean {
-        return code == android.speech.SpeechRecognizer.ERROR_NO_MATCH ||
-            code == android.speech.SpeechRecognizer.ERROR_SPEECH_TIMEOUT ||
-            code == ERROR_LANGUAGE_UNAVAILABLE ||
-            code == ERROR_TOO_MANY_REQUESTS
+        return code == SpeechRecognitionClient.ERROR_NO_MATCH
     }
 
     private fun speechErrorMessage(code: Int): String {
         return when (code) {
-            android.speech.SpeechRecognizer.ERROR_AUDIO -> "Audio recording error."
-            android.speech.SpeechRecognizer.ERROR_CLIENT -> "Speech recognition client error."
-            android.speech.SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Microphone permission is missing."
-            android.speech.SpeechRecognizer.ERROR_NETWORK -> "Network error while listening."
-            android.speech.SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Network timeout while listening."
-            android.speech.SpeechRecognizer.ERROR_NO_MATCH -> "I did not catch that."
-            android.speech.SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Speech recognizer is busy."
-            android.speech.SpeechRecognizer.ERROR_SERVER -> "Speech recognition server error."
-            android.speech.SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No speech detected."
-            ERROR_LANGUAGE_UNAVAILABLE -> "English speech recognition is temporarily unavailable."
-            ERROR_TOO_MANY_REQUESTS -> "Speech recognition is busy. Waiting a moment."
+            SpeechRecognitionClient.ERROR_AUDIO_RECORD -> "Audio recording error."
+            SpeechRecognitionClient.ERROR_PERMISSION -> "Microphone permission is missing."
+            SpeechRecognitionClient.ERROR_BACKEND_NOT_CONFIGURED -> "Backend is required for continuous speech recognition."
+            SpeechRecognitionClient.ERROR_NO_MATCH -> "I did not catch that."
             else -> "Speech recognition failed with code $code."
         }
     }

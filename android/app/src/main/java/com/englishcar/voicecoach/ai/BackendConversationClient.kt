@@ -1,6 +1,7 @@
 package com.englishcar.voicecoach.ai
 
 import java.io.IOException
+import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -14,6 +15,49 @@ import org.json.JSONObject
 
 @Singleton
 class BackendConversationClient @Inject constructor() {
+    suspend fun transcribe(
+        backendUrl: String,
+        appApiToken: String,
+        wavAudio: ByteArray
+    ): String = withContext(Dispatchers.IO) {
+        val baseUrl = backendUrl.trim().trimEnd('/')
+        if (baseUrl.isBlank()) throw BackendException.BackendUnavailable
+        if (appApiToken.isBlank()) throw BackendException.Unauthorized
+
+        val boundary = "EnglishCar${System.currentTimeMillis()}"
+        val connection = (URL("$baseUrl/v1/transcribe").openConnection() as HttpURLConnection).apply {
+            requestMethod = "POST"
+            connectTimeout = 15_000
+            readTimeout = 45_000
+            doOutput = true
+            setRequestProperty("Authorization", "Bearer $appApiToken")
+            setRequestProperty("Accept", "application/json")
+            setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+        }
+
+        try {
+            connection.outputStream.use { output ->
+                output.writeMultipartAudio(boundary, wavAudio)
+            }
+            val responseCode = connection.responseCode
+            val responseText = if (responseCode in 200..299) {
+                connection.inputStream.bufferedReader().use { it.readText() }
+            } else {
+                connection.errorStream?.bufferedReader()?.use { it.readText() }.orEmpty()
+            }
+
+            if (responseCode !in 200..299) {
+                throw BackendException.fromHttp(responseCode, responseText)
+            }
+
+            JSONObject(responseText).optString("text").trim()
+        } catch (error: Exception) {
+            throw BackendException.fromThrowable(error)
+        } finally {
+            connection.disconnect()
+        }
+    }
+
     suspend fun fetchModels(
         backendUrl: String,
         appApiToken: String
@@ -172,6 +216,16 @@ class BackendConversationClient @Inject constructor() {
     private fun JSONObject.optNullableString(name: String): String? {
         if (!has(name) || isNull(name)) return null
         return optString(name).takeIf { it.isNotBlank() }
+    }
+
+    private fun OutputStream.writeMultipartAudio(boundary: String, wavAudio: ByteArray) {
+        fun writeText(value: String) = write(value.toByteArray(Charsets.UTF_8))
+        writeText("--$boundary\r\n")
+        writeText("Content-Disposition: form-data; name=\"audio\"; filename=\"speech.wav\"\r\n")
+        writeText("Content-Type: audio/wav\r\n\r\n")
+        write(wavAudio)
+        writeText("\r\n--$boundary--\r\n")
+        flush()
     }
 }
 

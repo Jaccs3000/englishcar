@@ -1091,7 +1091,7 @@ Pipeline oficial:
 
 ```text
 Microphone
--> SpeechRecognizer
+-> AudioRecord continuous capture
 -> ConversationManager
 -> Backend
 -> OpenAI
@@ -1109,16 +1109,19 @@ Reglas:
 - Evitar que la app escuche su propia voz.
 - Si el usuario interrumpe mientras TTS habla, detener TTS y volver a Listening.
 
-### SpeechRecognizer
+### Continuous speech recognition
 
 Reglas:
 
 - Pedir permiso de microfono al pulsar PLAY si todavia no existe.
 - En esta primera version se asume que el usuario concede el permiso de microfono.
 - Si el permiso se deniega, mostrar solo un mensaje simple. No crear flujo avanzado hacia Settings del sistema en el MVP.
-- Si SpeechRecognizer no esta disponible, mostrar Error no recuperable.
+- Mantener el microfono abierto con `AudioRecord` mientras la app esta en Listening.
+- Detectar fin de frase por silencio local usando el silence timeout configurado.
+- Enviar el audio capturado al backend para transcripcion.
+- No reiniciar el microfono cada pocos segundos durante espera silenciosa.
 - Usar `en-US`.
-- Reiniciar escucha automaticamente cuando sea seguro hacerlo.
+- Si no hay frase util, seguir escuchando sin convertirlo en error fatal.
 
 ### Google TTS
 
@@ -1407,6 +1410,12 @@ Estado implementado:
   - pantalla de Android Auto se actualiza con cambios de estado de conversacion;
   - Start desde Android Auto inicia tambien el Foreground Service;
   - Finish desde Android Auto detiene tambien el Foreground Service.
+- Migracion de reconocimiento de voz:
+  - reemplazado `SpeechRecognizer` por captura continua `AudioRecord`;
+  - agregado endpoint backend `/v1/transcribe`;
+  - transcripcion con OpenAI `gpt-4o-mini-transcribe`;
+  - Android envia WAV al backend con `Authorization: Bearer <APP_API_TOKEN>`;
+  - el microfono permanece activo durante Listening hasta detectar frase, pausar, finalizar o salir.
 - Pulido visual inicial de HomeScreen/ConversationScreen:
   - onda animada ligera;
   - estado central mas visible;

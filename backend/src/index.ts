@@ -43,6 +43,34 @@ app.get("/v1/models", (c) => {
   });
 });
 
+app.post("/v1/transcribe", async (c) => {
+  const form = await c.req.formData().catch(() => null);
+  const audio = form?.get("audio");
+
+  if (!audio || typeof audio !== "object" || !("arrayBuffer" in audio) || !("size" in audio)) {
+    return c.json({ error: "Audio file is required" }, 400);
+  }
+
+  const audioFile = audio as unknown as File;
+
+  if (audioFile.size < 800) {
+    return c.json({ text: "" });
+  }
+
+  const client = new OpenAI({ apiKey: c.env.OPENAI_API_KEY });
+  const transcript = await client.audio.transcriptions.create({
+    file: audioFile,
+    model: "gpt-4o-mini-transcribe",
+    language: "en",
+    prompt: "Natural American English practice conversation from a single speaker.",
+    response_format: "json"
+  });
+
+  return c.json({
+    text: transcript.text?.trim() ?? ""
+  });
+});
+
 app.post("/v1/conversation/stream", async (c) => {
   const body = await c.req.json().catch(() => null);
   const parsed = conversationRequestSchema.safeParse(body);
