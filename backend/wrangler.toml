@@ -1,0 +1,7 @@
+name = "english-car-backend"
+main = "src/index.ts"
+compatibility_date = "2026-05-03"
+
+[vars]
+ALLOWED_MODELS = "gpt-5.2,gpt-5-mini,gpt-5-nano,gpt-4o-mini"
+DEFAULT_MODEL = "gpt-4o-mini"

@@ -1,0 +1,32 @@
+# Local secrets and machine-specific files
+.env
+.env.*
+.dev.vars
+local.properties
+
+# Android / Gradle outputs
+.gradle/
+build/
+app/build/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+
+# Backend outputs
+node_modules/
+backend/node_modules/
+.wrangler/
+backend/.wrangler/
+dist/
+backend/dist/
+backend/.dev.vars
+
+# IDE and OS noise
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local working copies
+plan - copia.txt
