@@ -55,6 +55,8 @@ class ConversationManager @Inject constructor(
     private companion object {
         const val TAG = "EnglishCarConversation"
         const val MAX_PAUSED_COMMAND_ATTEMPTS = 1
+        const val MIN_LISTEN_WINDOW_MS = 8_000L
+        const val MAX_SHORT_NO_MATCH_RETRIES = 3
     }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, error ->
@@ -81,6 +83,8 @@ class ConversationManager @Inject constructor(
     private var generation = 0L
     private var ignoreSpeechErrorsUntilMs = 0L
     private var consecutiveNoMatchCount = 0
+    private var listenStartedAtMs = 0L
+    private var shortNoMatchRetries = 0
 
     init {
         scope.launch {
@@ -225,6 +229,7 @@ class ConversationManager @Inject constructor(
         scheduleTimers()
         pausedCommandMode = false
         pausedCommandListenAttempts = 0
+        listenStartedAtMs = SystemClock.elapsedRealtime()
         _uiState.update { it.copy(state = ConversationState.Listening, errorMessage = null) }
         speechRecognitionClient.startListening(currentSilenceTimeoutMs)
     }
@@ -417,6 +422,17 @@ class ConversationManager @Inject constructor(
         if (code == SpeechRecognitionClient.ERROR_NO_MATCH) {
             scope.launch {
                 consecutiveNoMatchCount += 1
+                val listenedMs = SystemClock.elapsedRealtime() - listenStartedAtMs
+                if (listenedMs < MIN_LISTEN_WINDOW_MS && shortNoMatchRetries < MAX_SHORT_NO_MATCH_RETRIES) {
+                    shortNoMatchRetries += 1
+                    diagnosticsLogger.add("Conversation", "short no match listenedMs=$listenedMs retry=$shortNoMatchRetries")
+                    delay(400)
+                    if (isSessionActive && _uiState.value.state == ConversationState.Listening) {
+                        listen(resetInactivityTimer = false)
+                    }
+                    return@launch
+                }
+                shortNoMatchRetries = 0
                 diagnosticsLogger.add("Conversation", "no match count=$consecutiveNoMatchCount; awaiting user tap")
                 speechRecognitionClient.stopListening()
                 _uiState.update { it.copy(state = ConversationState.AwaitingUser, lastUserText = "", errorMessage = null) }
