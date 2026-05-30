@@ -55,6 +55,7 @@ class ConversationManager @Inject constructor(
     private companion object {
         const val TAG = "EnglishCarConversation"
         const val MAX_PAUSED_COMMAND_ATTEMPTS = 1
+        const val MAX_CONSECUTIVE_NO_MATCH = 5
     }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, error ->
@@ -417,6 +418,11 @@ class ConversationManager @Inject constructor(
         if (code == SpeechRecognitionClient.ERROR_NO_MATCH) {
             scope.launch {
                 consecutiveNoMatchCount += 1
+                if (consecutiveNoMatchCount >= MAX_CONSECUTIVE_NO_MATCH) {
+                    diagnosticsLogger.add("Conversation", "no match limit reached count=$consecutiveNoMatchCount; auto pause")
+                    pause(spoken = false)
+                    return@launch
+                }
                 val delayMs = when {
                     consecutiveNoMatchCount >= 6 -> 4_000L
                     consecutiveNoMatchCount >= 3 -> 2_500L
