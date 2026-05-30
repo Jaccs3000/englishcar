@@ -54,7 +54,7 @@ class ConversationManager @Inject constructor(
 ) {
     private companion object {
         const val TAG = "EnglishCarConversation"
-        const val MAX_PAUSED_COMMAND_ATTEMPTS = 12
+        const val MAX_PAUSED_COMMAND_ATTEMPTS = 1
     }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, error ->
@@ -257,10 +257,9 @@ class ConversationManager @Inject constructor(
             if (handleLocalCommand(text)) return@launch
 
             if (pausedCommandMode || _uiState.value.state == ConversationState.Paused) {
-                if (pausedCommandListenAttempts < MAX_PAUSED_COMMAND_ATTEMPTS) {
-                    delay(600)
-                    if (isSessionActive && pausedCommandMode) listenForPausedCommand()
-                }
+                diagnosticsLogger.add("Conversation", "paused ignored non-command text=${text.take(80)}")
+                pausedCommandMode = false
+                _uiState.update { it.copy(state = ConversationState.Paused, errorMessage = null) }
                 return@launch
             }
 
