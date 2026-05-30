@@ -103,7 +103,10 @@ class ConversationManager @Inject constructor(
             return
         }
 
+        generation += 1
+        val startGeneration = generation
         scope.launch {
+            if (generation != startGeneration) return@launch
             audioFocusHandler.request { pauseForInterruption("We can continue whenever you're ready.") }
             val settings = settingsRepository.currentSettings()
             currentSilenceTimeoutMs = settings.silenceTimeoutMs
@@ -113,7 +116,12 @@ class ConversationManager @Inject constructor(
             pausedCommandMode = false
             pausedCommandListenAttempts = 0
             lastInteractionMs = SystemClock.elapsedRealtime()
-            speakThenListen("I'm ready", resetInactivityTimer = true)
+            speakOnly("I'm ready")
+            if (generation == startGeneration && isSessionActive) {
+                listen(resetInactivityTimer = true)
+            } else {
+                diagnosticsLogger.add("Conversation", "start ignored stale generation=$startGeneration current=$generation")
+            }
         }
     }
 
@@ -139,11 +147,16 @@ class ConversationManager @Inject constructor(
             if (closeApp) _events.tryEmit(ConversationEvent.CloseApp)
             return
         }
+        val finishGeneration = generation
         speechRecognitionClient.stopListening()
         scope.launch {
             speakOnly("See you later.")
-            finish()
-            if (closeApp) _events.tryEmit(ConversationEvent.CloseApp)
+            if (generation == finishGeneration) {
+                finish()
+                if (closeApp) _events.tryEmit(ConversationEvent.CloseApp)
+            } else {
+                diagnosticsLogger.add("Conversation", "finish ignored stale generation=$finishGeneration current=$generation")
+            }
         }
     }
 
