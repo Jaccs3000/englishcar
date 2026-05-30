@@ -4,6 +4,7 @@ import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
+import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import java.util.UUID
@@ -15,15 +16,28 @@ import kotlin.coroutines.resume
 
 @Singleton
 class TextToSpeechClient @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val diagnosticsLogger: DiagnosticsLogger
 ) {
     private var tts: TextToSpeech? = null
     private var initResult: CompletableDeferred<Boolean>? = null
 
+    suspend fun warmUp(): Boolean {
+        diagnosticsLogger.add("TTS", "warmUp requested")
+        return ensureReady()
+    }
+
     suspend fun speak(text: String): Boolean {
+        diagnosticsLogger.add("TTS", "speak generic chars=${text.length}")
         val isReady = ensureReady()
-        if (!isReady) return false
-        val engine = tts ?: return false
+        if (!isReady) {
+            diagnosticsLogger.add("TTS", "speak generic aborted notReady")
+            return false
+        }
+        val engine = tts ?: run {
+            diagnosticsLogger.add("TTS", "speak generic aborted engineMissing")
+            return false
+        }
         chooseVoice(preferMale = null)?.let { engine.voice = it }
         engine.setPitch(1.0f)
         engine.setSpeechRate(0.95f)
@@ -31,9 +45,16 @@ class TextToSpeechClient @Inject constructor(
     }
 
     suspend fun preview(text: String, assistantId: String, preferMale: Boolean): Boolean {
+        diagnosticsLogger.add("TTS", "preview assistant=$assistantId preferMale=$preferMale chars=${text.length}")
         val isReady = ensureReady()
-        if (!isReady) return false
-        val engine = tts ?: return false
+        if (!isReady) {
+            diagnosticsLogger.add("TTS", "preview aborted notReady assistant=$assistantId")
+            return false
+        }
+        val engine = tts ?: run {
+            diagnosticsLogger.add("TTS", "preview aborted engineMissing assistant=$assistantId")
+            return false
+        }
         val style = voiceStyle(assistantId)
         chooseVoice(preferMale = preferMale, index = style.voiceIndex)?.let { engine.voice = it }
         engine.setPitch(style.pitch)
@@ -42,12 +63,19 @@ class TextToSpeechClient @Inject constructor(
     }
 
     suspend fun speakAsAssistant(text: String, assistantId: String): Boolean {
+        diagnosticsLogger.add("TTS", "speak assistant=$assistantId chars=${text.length}")
         val isReady = ensureReady()
-        if (!isReady) return false
-        val engine = tts ?: return false
+        if (!isReady) {
+            diagnosticsLogger.add("TTS", "speak assistant aborted notReady assistant=$assistantId")
+            return false
+        }
+        val engine = tts ?: run {
+            diagnosticsLogger.add("TTS", "speak assistant aborted engineMissing assistant=$assistantId")
+            return false
+        }
         val style = voiceStyle(assistantId)
         chooseVoice(
-            preferMale = assistantId == "alex" || assistantId == "james",
+            preferMale = assistantId == "male",
             index = style.voiceIndex
         )?.let { engine.voice = it }
         engine.setPitch(style.pitch)
@@ -58,11 +86,17 @@ class TextToSpeechClient @Inject constructor(
     private suspend fun speakWithEngine(engine: TextToSpeech, text: String): Boolean {
         return suspendCancellableCoroutine { continuation ->
             val utteranceId = UUID.randomUUID().toString()
+            diagnosticsLogger.add("TTS", "utterance start id=${utteranceId.take(8)} chars=${text.length}")
             engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                override fun onStart(utteranceId: String?) = Unit
+                override fun onStart(utteranceId: String?) {
+                    if (utteranceId != null) {
+                        diagnosticsLogger.add("TTS", "utterance speaking id=${utteranceId.take(8)}")
+                    }
+                }
 
                 override fun onDone(doneUtteranceId: String?) {
                     if (doneUtteranceId == utteranceId && continuation.isActive) {
+                        diagnosticsLogger.add("TTS", "utterance done id=${utteranceId.take(8)}")
                         continuation.resume(true)
                     }
                 }
@@ -70,16 +104,25 @@ class TextToSpeechClient @Inject constructor(
                 @Deprecated("Deprecated in Java")
                 override fun onError(errorUtteranceId: String?) {
                     if (errorUtteranceId == utteranceId && continuation.isActive) {
+                        diagnosticsLogger.add("TTS", "utterance error id=${utteranceId.take(8)}")
                         continuation.resume(false)
                     }
                 }
             })
-            engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
-            continuation.invokeOnCancellation { engine.stop() }
+            val result = engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
+            diagnosticsLogger.add("TTS", "utterance enqueue id=${utteranceId.take(8)} result=$result")
+            if (result == TextToSpeech.ERROR && continuation.isActive) {
+                continuation.resume(false)
+            }
+            continuation.invokeOnCancellation {
+                diagnosticsLogger.add("TTS", "utterance cancelled id=${utteranceId.take(8)}")
+                engine.stop()
+            }
         }
     }
 
     fun stop() {
+        diagnosticsLogger.add("TTS", "stop requested")
         tts?.stop()
     }
 
@@ -88,11 +131,13 @@ class TextToSpeechClient @Inject constructor(
             .filter { it.locale.language == Locale.US.language && it.locale.country == Locale.US.country }
             .sortedWith(compareByDescending<Voice> { it.quality }.thenBy { it.latency })
 
-        if (voices.isEmpty()) return null
+        if (voices.isEmpty()) {
+            diagnosticsLogger.add("TTS", "voice selection failed noUsVoices")
+            return null
+        }
 
-        val embedded = voices.filterNot { it.isNetworkConnectionRequired }.ifEmpty { voices }
         val maleHints = listOf("male", "man")
-        val femaleHints = listOf("female", "woman", "a", "b", "c", "e", "f")
+        val femaleHints = listOf("female", "woman")
 
         fun Voice.matches(hints: List<String>): Boolean {
             val lower = name.lowercase()
@@ -101,32 +146,68 @@ class TextToSpeechClient @Inject constructor(
             }
         }
 
-        val candidates = when (preferMale) {
-            true -> embedded.filter { it.matches(maleHints) }.ifEmpty { listOfNotNull(embedded.lastOrNull()) }
-            false -> embedded.filter { it.matches(femaleHints) }.ifEmpty { embedded }
-            null -> embedded
+        fun Voice.naturalScore(): Int {
+            val lower = name.lowercase()
+            val qualityScore = quality * 100
+            val latencyPenalty = latency * 10
+            val networkBonus = if (isNetworkConnectionRequired) 18 else 0
+            val naturalNameBonus = when {
+                "neural" in lower || "wavenet" in lower || "studio" in lower -> 50
+                "enhanced" in lower || "premium" in lower -> 30
+                else -> 0
+            }
+            val genderBonus = when {
+                preferMale == true && matches(maleHints) -> 80
+                preferMale == false && matches(femaleHints) -> 80
+                else -> 0
+            }
+            return qualityScore + naturalNameBonus + genderBonus + networkBonus - latencyPenalty
         }
-        return candidates[index.mod(candidates.size)]
+
+        val candidates = when (preferMale) {
+            true -> voices.filter { it.matches(maleHints) }.ifEmpty {
+                voices
+                    .filterNot { it.name.contains("sfg", ignoreCase = true) }
+                    .ifEmpty { voices }
+                    .sortedWith(
+                        compareBy<Voice> { it.isNetworkConnectionRequired }
+                            .thenByDescending { it.quality }
+                            .thenBy { it.latency }
+                    )
+            }
+            false -> voices.filter { it.matches(femaleHints) }.ifEmpty { voices }
+            null -> voices
+        }
+            .sortedByDescending { it.naturalScore() }
+
+        return candidates[index.mod(candidates.size)].also {
+            diagnosticsLogger.add(
+                "TTS",
+                "voice selected name=${it.name} locale=${it.locale} network=${it.isNetworkConnectionRequired} quality=${it.quality} latency=${it.latency}"
+            )
+        }
     }
 
     private data class VoiceStyle(val voiceIndex: Int, val pitch: Float, val rate: Float)
 
     private fun voiceStyle(assistantId: String): VoiceStyle {
         return when (assistantId) {
-            "emma" -> VoiceStyle(voiceIndex = 1, pitch = 1.18f, rate = 1.04f)
-            "sophia" -> VoiceStyle(voiceIndex = 0, pitch = 0.94f, rate = 0.88f)
-            "alex" -> VoiceStyle(voiceIndex = 0, pitch = 0.86f, rate = 1.00f)
-            "james" -> VoiceStyle(voiceIndex = 0, pitch = 0.64f, rate = 0.82f)
+            "female" -> VoiceStyle(voiceIndex = 0, pitch = 1.0f, rate = 0.9f)
+            "male" -> VoiceStyle(voiceIndex = 0, pitch = 0.78f, rate = 0.92f)
             else -> VoiceStyle(voiceIndex = 0, pitch = 1.0f, rate = 0.95f)
         }
     }
 
     private suspend fun ensureReady(): Boolean {
-        initResult?.let { return it.await() }
+        initResult?.let {
+            diagnosticsLogger.add("TTS", "ensureReady await existing")
+            return it.await()
+        }
 
         val deferred = CompletableDeferred<Boolean>()
         initResult = deferred
 
+        diagnosticsLogger.add("TTS", "ensureReady init start")
         tts = TextToSpeech(context) { status ->
             val engine = tts
             val ready = status == TextToSpeech.SUCCESS && engine != null
@@ -134,6 +215,7 @@ class TextToSpeechClient @Inject constructor(
                 engine?.language = Locale.US
                 engine?.setSpeechRate(0.95f)
             }
+            diagnosticsLogger.add("TTS", "ensureReady init result status=$status ready=$ready")
             deferred.complete(ready)
         }
 

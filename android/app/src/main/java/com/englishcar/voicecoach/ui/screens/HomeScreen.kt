@@ -64,7 +64,9 @@ fun HomeScreen(
     onResumeConversation: (Boolean) -> Unit,
     onRetryConversation: (Boolean) -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenFeedback: () -> Unit
+    onOpenFeedback: () -> Unit,
+    onOpenLogs: () -> Unit,
+    onCloseApp: () -> Unit
 ) {
     val context = LocalContext.current
     var pendingRetry by remember { mutableStateOf(false) }
@@ -152,10 +154,10 @@ fun HomeScreen(
                     enabled = !startRequested,
                     onClick = { requestStart(retry = conversationUiState.state == ConversationState.Error) },
                     modifier = Modifier
-                        .size(96.dp)
+                        .size(184.dp)
                         .shadow(24.dp, CircleShape)
                 ) {
-                    Text("PLAY", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    Text("PLAY", fontSize = 28.sp, fontWeight = FontWeight.Bold)
                 }
             } else if (conversationUiState.state == ConversationState.Paused) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -213,8 +215,14 @@ fun HomeScreen(
                 TextButton(onClick = onOpenFeedback) {
                     Text("Feedback")
                 }
+                TextButton(onClick = onOpenLogs) {
+                    Text("Logs")
+                }
                 TextButton(onClick = onOpenSettings) {
                     Text("Settings")
+                }
+                TextButton(onClick = onCloseApp) {
+                    Text("Exit")
                 }
             }
         }

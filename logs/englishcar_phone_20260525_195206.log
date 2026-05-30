@@ -1,0 +1,47 @@
+--------- beginning of main
+05-25 19:52:16.019 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:52:16.019 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:52:16.019 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:52:16.019 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:52:16.019 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:52:16.019 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:52:16.019 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:52:16.019 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:52:16.019 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:52:16.019 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:52:16.019 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:52:16.019 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:52:16.019 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:54:55.566 D/EnglishCarDiagnostics(17973): 19:54:55.564 Activity: onCreate
+05-25 19:54:55.604 D/EnglishCarDiagnostics(17973): 19:54:55.603 Activity: onStart
+05-25 19:54:55.809 D/EnglishCarDiagnostics(17973): 19:54:55.809 TTS: warmUp requested
+05-25 19:54:55.819 D/EnglishCarDiagnostics(17973): 19:54:55.819 TTS: ensureReady init start
+05-25 19:54:56.567 D/EnglishCarDiagnostics(17973): 19:54:56.566 TTS: ensureReady init result status=0 ready=true
+05-25 19:55:55.536 D/EnglishCarDiagnostics(17973): 19:55:55.535 Activity: onStop
+05-25 19:57:00.870 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:57:00.870 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:57:00.870 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:57:00.870 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:57:00.870 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:57:00.870 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:57:00.870 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:57:00.870 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:57:00.870 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:57:00.870 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:57:00.870 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:57:00.870 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:57:00.870 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:57:07.819 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:57:07.819 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:57:07.819 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:57:07.819 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:57:07.819 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:57:07.819 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:57:07.819 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:57:07.819 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:57:07.819 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:57:07.819 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:57:07.819 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:57:07.819 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:57:07.819 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:57:57.859 D/EnglishCarDiagnostics(17973): 19:57:57.854 Activity: onStart

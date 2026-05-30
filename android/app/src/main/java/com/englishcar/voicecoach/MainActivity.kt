@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.content.ContextCompat
 import com.englishcar.voicecoach.conversation.ConversationManager
+import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
 import com.englishcar.voicecoach.navigation.EnglishCarApp
 import com.englishcar.voicecoach.ui.theme.EnglishCarTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var conversationManager: ConversationManager
+    @Inject lateinit var diagnosticsLogger: DiagnosticsLogger
     private var noisyAudioReceiverRegistered = false
 
     private val noisyAudioReceiver = object : BroadcastReceiver() {
@@ -30,10 +32,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        diagnosticsLogger.add("Activity", "onCreate")
         setContent {
             EnglishCarTheme {
                 EnglishCarApp(
-                    onCloseApp = { finishAndRemoveTask() }
+                    onCloseApp = {
+                        diagnosticsLogger.add("Activity", "finishAndRemoveTask requested")
+                        finishAndRemoveTask()
+                    }
                 )
             }
         }
@@ -41,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
+        diagnosticsLogger.add("Activity", "onStart")
         ContextCompat.registerReceiver(
             this,
             noisyAudioReceiver,
@@ -51,10 +58,16 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() {
+        diagnosticsLogger.add("Activity", "onStop")
         if (noisyAudioReceiverRegistered) {
             unregisterReceiver(noisyAudioReceiver)
             noisyAudioReceiverRegistered = false
         }
         super.onStop()
+    }
+
+    override fun onDestroy() {
+        diagnosticsLogger.add("Activity", "onDestroy finishing=$isFinishing changingConfig=$isChangingConfigurations")
+        super.onDestroy()
     }
 }

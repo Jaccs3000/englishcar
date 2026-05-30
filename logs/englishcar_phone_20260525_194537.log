@@ -1,0 +1,3 @@
+--------- beginning of main
+05-25 19:45:37.605 D/EnglishCarRealtime(14910): session heartbeat ageMs=75016 framesSent=1083 audioBytesReceived=813600 socketOpen=true
+05-25 19:45:37.608 D/EnglishCarDiagnostics(14910): 19:45:37.606 Realtime: heartbeat ageMs=75016 framesSent=1083 audioBytesReceived=813600 socketOpen=true

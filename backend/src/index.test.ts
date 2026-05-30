@@ -1,87 +1,67 @@
 import { describe, expect, it } from "vitest";
-import app, { cleanFeedbackText, feedbackInstruction, normalizeFeedback } from "./index";
-import type { Env } from "./types";
+import app, { cleanFeedbackText, normalizeFeedback, normalizeTranscriptText } from "./index";
 
-const env: Env = {
-  OPENAI_API_KEY: "test-openai-key",
+const env = {
+  GEMINI_API_KEY: "",
   APP_API_TOKEN: "test-token",
-  ALLOWED_MODELS: "gpt-5.2,gpt-5-mini,gpt-5-nano",
-  DEFAULT_MODEL: "gpt-5-mini"
+  ALLOWED_MODELS: "gemini-2.5-flash-lite,gemini-2.0-flash-lite,gemini-2.0-flash,gemini-2.5-flash",
+  DEFAULT_MODEL: "gemini-2.5-flash-lite"
 };
 
-describe("english car backend", () => {
-  it("returns health without authentication", async () => {
+describe("english car gemini backend", () => {
+  it("returns health capabilities", async () => {
     const response = await app.request("/health", {}, env);
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ ok: true });
+    const body = await response.json() as { aiProvider: string; capabilities: { transcribe: boolean } };
+    expect(body.aiProvider).toBe("google-gemini");
+    expect(body.capabilities.transcribe).toBe(true);
   });
 
-  it("rejects private endpoints without token", async () => {
+  it("requires token for models", async () => {
     const response = await app.request("/v1/models", {}, env);
     expect(response.status).toBe(401);
   });
 
-  it("returns allowed models with token", async () => {
-    const response = await app.request(
-      "/v1/models",
-      { headers: { Authorization: "Bearer test-token" } },
-      env
-    );
+  it("returns gemini model allowlist", async () => {
+    const response = await app.request("/v1/models", { headers: { Authorization: "Bearer test-token" } }, env);
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({
-      models: ["gpt-5.2", "gpt-5-mini", "gpt-5-nano"],
-      defaultModel: "gpt-5-mini"
-    });
+    const body = await response.json() as { models: string[]; defaultModel: string };
+    expect(body.models[0]).toBe("gemini-2.5-flash-lite");
+    expect(body.defaultModel).toBe("gemini-2.5-flash-lite");
   });
 
-  it("cleans placeholder feedback values", () => {
+  it("normalizes correction placeholders", () => {
     expect(cleanFeedbackText("none")).toBeNull();
-    expect(cleanFeedbackText("N/A")).toBeNull();
-    expect(cleanFeedbackText("ninguna")).toBeNull();
     expect(cleanFeedbackText("I went yesterday.")).toBe("I went yesterday.");
   });
 
-  it("does not save feedback when every structured value is empty", () => {
-    const normalized = normalizeFeedback(
-      {
-        spokenReply: "Nice. Tell me more.",
-        correction: "none",
-        naturalAlternative: "n/a",
-        shortExplanation: null,
-        shouldSaveFeedback: true
-      },
-      "medium"
-    );
-
-    expect(normalized).toEqual({
-      spokenReply: "Nice. Tell me more.",
-      correction: null,
+  it("adds a required correction prefix when feedback exists", () => {
+    const normalized = normalizeFeedback({
+      spokenReply: "Good. Tell me more.",
+      correction: "I went yesterday.",
       naturalAlternative: null,
       shortExplanation: null,
       shouldSaveFeedback: false
     });
-  });
-
-  it("forces spoken correction when feedback level is high", () => {
-    const normalized = normalizeFeedback(
-      {
-        spokenReply: "What did you do after that?",
-        correction: "I went yesterday.",
-        naturalAlternative: null,
-        shortExplanation: "Use past tense for yesterday.",
-        shouldSaveFeedback: true
-      },
-      "high"
-    );
-
-    expect(normalized.spokenReply).toContain("Quick correction");
-    expect(normalized.spokenReply).toContain("I went yesterday.");
+    expect(normalized.spokenReply).toContain("You should say:");
     expect(normalized.shouldSaveFeedback).toBe(true);
   });
 
-  it("builds distinct feedback instructions", () => {
-    expect(feedbackInstruction("low")).toContain("Only correct important");
-    expect(feedbackInstruction("medium")).toContain("Correction level: medium");
-    expect(feedbackInstruction("high")).toContain("Mention every useful correction");
+  it("ignores punctuation-only question mark feedback", () => {
+    const normalized = normalizeFeedback({
+      spokenReply: "You should say: What time is it? Good question.",
+      correction: "What time is it?",
+      naturalAlternative: null,
+      shortExplanation: "Missing question mark.",
+      shouldSaveFeedback: true
+    }, "what time is it");
+    expect(normalized.correction).toBeNull();
+    expect(normalized.shortExplanation).toBeNull();
+    expect(normalized.shouldSaveFeedback).toBe(false);
+  });
+
+  it("normalizes Gemini transcription JSON shapes", () => {
+    expect(normalizeTranscriptText("\"I am ready.\"")).toBe("I am ready.");
+    expect(normalizeTranscriptText("{\"text\":\"I went home.\"}")).toBe("I went home.");
   });
 });

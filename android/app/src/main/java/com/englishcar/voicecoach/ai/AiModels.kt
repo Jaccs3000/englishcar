@@ -14,7 +14,6 @@ data class ConversationRequest(
     val assistantPersonality: String,
     val userName: String? = null,
     val model: String,
-    val feedbackLevel: String,
     val locale: String = "en-US",
     val recentContext: List<ContextTurn>
 )

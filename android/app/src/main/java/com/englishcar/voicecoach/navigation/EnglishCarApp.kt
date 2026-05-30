@@ -4,12 +4,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.englishcar.voicecoach.ui.screens.HomeScreen
 import com.englishcar.voicecoach.ui.screens.FeedbackScreen
+import com.englishcar.voicecoach.ui.screens.DiagnosticsLogScreen
 import com.englishcar.voicecoach.ui.screens.SetupScreen
 import com.englishcar.voicecoach.ui.screens.SettingsScreen
 import com.englishcar.voicecoach.conversation.ConversationEvent
@@ -19,6 +25,7 @@ private object Routes {
     const val Home = "home"
     const val Settings = "settings"
     const val Feedback = "feedback"
+    const val Logs = "logs"
 }
 
 @Composable
@@ -27,9 +34,17 @@ fun EnglishCarApp(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val settings by viewModel.settings.collectAsState()
+    val settingsLoaded by viewModel.settingsLoaded.collectAsState()
     val conversationState by viewModel.conversationState.collectAsState()
+    val diagnosticEvents by viewModel.diagnosticEvents.collectAsState()
     val modelOptions by viewModel.modelOptions.collectAsState()
     val navController = rememberNavController()
+    if (!settingsLoaded) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
     val startDestination = if (settings.isFirstLaunchComplete) Routes.Home else Routes.Setup
 
     LaunchedEffect(Unit) {
@@ -48,7 +63,8 @@ fun EnglishCarApp(
                     navController.navigate(Routes.Home) {
                         popUpTo(Routes.Setup) { inclusive = true }
                     }
-                }
+                },
+                onPreviewAssistant = viewModel::previewAssistant
             )
         }
         composable(Routes.Home) {
@@ -62,7 +78,9 @@ fun EnglishCarApp(
                 onResumeConversation = viewModel::resumeConversation,
                 onRetryConversation = viewModel::retryConversation,
                 onOpenSettings = { navController.navigate(Routes.Settings) },
-                onOpenFeedback = { navController.navigate(Routes.Feedback) }
+                onOpenFeedback = { navController.navigate(Routes.Feedback) },
+                onOpenLogs = { navController.navigate(Routes.Logs) },
+                onCloseApp = viewModel::closeApp
             )
         }
         composable(Routes.Settings) {
@@ -84,6 +102,13 @@ fun EnglishCarApp(
             FeedbackScreen(
                 entries = entries,
                 onClear = feedbackViewModel::clear,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.Logs) {
+            DiagnosticsLogScreen(
+                events = diagnosticEvents,
+                onClear = viewModel::clearDiagnostics,
                 onBack = { navController.popBackStack() }
             )
         }

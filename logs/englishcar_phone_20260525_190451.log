@@ -1,0 +1,389 @@
+--------- beginning of main
+05-25 19:04:50.392 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:04:50.392 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:04:50.392 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:04:50.392 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:04:50.392 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:04:50.392 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:04:50.392 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:04:50.392 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:04:50.392 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:04:50.392 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:04:50.392 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:04:50.392 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:04:50.392 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:04:50.399 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:04:50.399 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:04:50.399 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:04:50.399 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:04:50.399 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:04:50.399 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:04:50.399 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:04:50.399 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:04:50.399 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:04:50.399 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:04:50.399 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:04:50.399 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:04:50.399 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:05:20.075 D/EnglishCarDiagnostics(32263): 19:05:20.073 Activity: onCreate
+05-25 19:05:20.114 D/EnglishCarDiagnostics(32263): 19:05:20.113 Activity: onStart
+05-25 19:05:20.319 D/EnglishCarDiagnostics(32263): 19:05:20.319 TTS: warmUp requested
+05-25 19:05:20.327 D/EnglishCarDiagnostics(32263): 19:05:20.327 TTS: ensureReady init start
+05-25 19:05:21.078 D/EnglishCarDiagnostics(32263): 19:05:21.077 TTS: ensureReady init result status=0 ready=true
+05-25 19:05:23.301 D/EnglishCarDiagnostics(32263): 19:05:23.301 Backend: fetchModels start host=english-car-backend.jaccs3000.workers.dev
+05-25 19:05:23.637 D/EnglishCarDiagnostics(32263): 19:05:23.637 Backend: fetchModels success count=3 default=gpt-5-mini
+05-25 19:06:17.259 D/EnglishCarDiagnostics(32263): 19:06:17.258 MainVM: startConversation permission=true
+05-25 19:06:17.265 D/EnglishCarDiagnostics(32263): 19:06:17.265 MainVM: start service before conversation
+05-25 19:06:17.270 D/EnglishCarDiagnostics(32263): 19:06:17.269 ServiceCtl: start requested
+05-25 19:06:17.278 D/EnglishCarDiagnostics(32263): 19:06:17.277 ServiceCtl: start dispatched
+05-25 19:06:17.281 D/EnglishCarDiagnostics(32263): 19:06:17.281 MainVM: call conversationManager.start
+05-25 19:06:17.284 D/EnglishCarConversation(32263): start permission=true
+05-25 19:06:17.285 D/EnglishCarDiagnostics(32263): 19:06:17.285 Conversation: start permission=true
+05-25 19:06:17.290 D/EnglishCarDiagnostics(32263): 19:06:17.290 AudioFocus: request start sdk=35
+05-25 19:06:17.297 D/EnglishCarDiagnostics(32263): 19:06:17.296 AudioFocus: request result=1 granted=true
+05-25 19:06:17.312 D/EnglishCarDiagnostics(32263): 19:06:17.312 Service: onCreate
+05-25 19:06:17.317 D/EnglishCarDiagnostics(32263): 19:06:17.316 Service: startForeground state=Idle
+05-25 19:06:17.333 D/EnglishCarDiagnostics(32263): 19:06:17.333 Service: onStartCommand action=start state=Idle
+05-25 19:06:17.336 D/EnglishCarDiagnostics(32263): 19:06:17.336 Service: startForeground state=Idle
+05-25 19:06:17.352 I/EnglishCarConversation(32263): start mode=RealtimeExperimental assistant=emma
+05-25 19:06:17.352 D/EnglishCarDiagnostics(32263): 19:06:17.352 Conversation: start mode=RealtimeExperimental assistant=emma
+05-25 19:06:17.355 I/EnglishCarConversation(32263): startRealtime assistant=emma
+05-25 19:06:17.355 D/EnglishCarDiagnostics(32263): 19:06:17.355 Conversation: startRealtime assistant=emma
+05-25 19:06:17.358 D/EnglishCarDiagnostics(32263): 19:06:17.358 Conversation: startRealtimeTransport transport=WebRtc
+05-25 19:06:17.361 D/EnglishCarDiagnostics(32263): 19:06:17.360 WebRTC: start assistant=emma
+05-25 19:06:17.363 D/EnglishCarDiagnostics(32263): 19:06:17.363 WebRTC: stop
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): WebRTC start failed
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): java.lang.NoClassDefFoundError: Failed resolution of: Lorg/webrtc/Environment;
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(PeerConnectionFactory.java:166)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(Unknown Source:0)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at org.webrtc.PeerConnectionFactory.builder(PeerConnectionFactory.java:295)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.buildPeerConnection(RealtimeWebRtcVoiceClient.kt:153)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.start(RealtimeWebRtcVoiceClient.kt:78)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtimeTransport(ConversationManager.kt:246)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtime(ConversationManager.kt:213)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.englishcar.voicecoach.conversation.ConversationManager.access$startRealtime(ConversationManager.kt:42)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.englishcar.voicecoach.conversation.ConversationManager$start$3.invokeSuspend(ConversationManager.kt:143)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith(DispatchedContinuation.kt:367)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith$default(DispatchedContinuation.kt:278)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.internal.ScopeCoroutine.afterCompletion(Scopes.kt:27)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.continueCompleting(JobSupport.kt:940)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.access$continueCompleting(JobSupport.kt:25)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport$ChildCompletion.invoke(JobSupport.kt:1159)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.notifyCompletion(JobSupport.kt:1497)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.completeStateFinalization(JobSupport.kt:325)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.finalizeFinishingState(JobSupport.kt:242)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.tryMakeCompletingSlowPath(JobSupport.kt:910)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.tryMakeCompleting(JobSupport.kt:867)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.JobSupport.makeCompletingOnce$kotlinx_coroutines_core(JobSupport.kt:832)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:108)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at android.os.Handler.handleCallback(Handler.java:1001)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at android.os.Handler.dispatchMessage(Handler.java:105)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): Caused by: java.lang.ClassNotFoundException: Didn't find class "org.webrtc.Environment" on path: DexPathList[[zip file "/data/app/~~0Mcdsu4mb53VE-uokK04zg==/com.englishcar.voicecoach-yRy9sT1y6_SL_qJByqC4Fw==/base.apk"],nativeLibraryDirectories=[/data/app/~~0Mcdsu4mb53VE-uokK04zg==/com.englishcar.voicecoach-yRy9sT1y6_SL_qJByqC4Fw==/lib/arm64, /data/app/~~0Mcdsu4mb53VE-uokK04zg==/com.englishcar.voicecoach-yRy9sT1y6_SL_qJByqC4Fw==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:642)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:578)
+05-25 19:06:17.389 E/EnglishCarWebRTC(32263): 	... 33 more
+05-25 19:06:17.389 D/EnglishCarDiagnostics(32263): 19:06:17.389 WebRTC: start failed NoClassDefFoundError message=Failed resolution of: Lorg/webrtc/Environment;
+05-25 19:06:17.392 D/EnglishCarDiagnostics(32263): 19:06:17.392 WebRTC: stop
+05-25 19:06:17.394 D/EnglishCarConversation(32263): realtimeEvent=Failed(messageLength=23)
+05-25 19:06:17.395 D/EnglishCarDiagnostics(32263): 19:06:17.394 Conversation: realtimeEvent=Failed(messageLength=23)
+05-25 19:06:17.397 D/EnglishCarDiagnostics(32263): 19:06:17.397 Conversation: fallback WebRTC to WebSocket
+05-25 19:06:17.399 D/EnglishCarDiagnostics(32263): 19:06:17.399 WebRTC: stop
+05-25 19:06:17.440 D/EnglishCarDiagnostics(32263): 19:06:17.440 Conversation: startRealtimeTransport transport=WebSocket
+05-25 19:06:17.442 I/EnglishCarRealtime(32263): start assistantId=emma mode=realtime
+05-25 19:06:17.442 D/EnglishCarDiagnostics(32263): 19:06:17.442 Realtime: start assistant=emma
+05-25 19:06:17.447 D/EnglishCarRealtime(32263): requesting realtime client secret backendHost=english-car-backend.jaccs3000.workers.dev
+05-25 19:06:17.447 D/EnglishCarDiagnostics(32263): 19:06:17.447 Realtime: request client secret host=english-car-backend.jaccs3000.workers.dev
+05-25 19:06:17.450 D/EnglishCarBackendClient(32263): createRealtimeClientSecret host=english-car-backend.jaccs3000.workers.dev assistant=emma voice=shimmer
+05-25 19:06:17.450 D/EnglishCarDiagnostics(32263): 19:06:17.450 Backend: realtime secret start host=english-car-backend.jaccs3000.workers.dev assistant=emma voice=shimmer
+05-25 19:06:17.632 I/EnglishCarBackendClient(32263): createRealtimeClientSecret success durationMs=182 expiresAt=1779754578
+05-25 19:06:17.633 D/EnglishCarDiagnostics(32263): 19:06:17.633 Backend: realtime secret success durationMs=182 expiresAt=1779754578
+05-25 19:06:17.639 I/EnglishCarRealtime(32263): realtime client secret received durationMs=191 expiresAt=1779754578
+05-25 19:06:17.639 D/EnglishCarDiagnostics(32263): 19:06:17.639 Realtime: client secret received durationMs=192
+05-25 19:06:17.642 D/EnglishCarRealtime(32263): websocket connecting host=api.openai.com
+05-25 19:06:17.643 D/EnglishCarDiagnostics(32263): 19:06:17.643 Realtime: websocket connecting
+05-25 19:06:18.856 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:18.856 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:18.856 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:18.856 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:18.856 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:18.856 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:18.856 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:18.856 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:18.856 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:18.856 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:18.856 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:18.856 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:18.856 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:21.580 D/EnglishCarRealtime(32263): tls handshake complete protocol=TLSv1.3
+05-25 19:06:21.581 D/EnglishCarDiagnostics(32263): 19:06:21.581 Realtime: tls handshake protocol=TLSv1.3
+05-25 19:06:21.625 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:21.625 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:21.625 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:21.625 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:21.625 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:21.625 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:21.625 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:21.625 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:21.625 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:21.625 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:21.625 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:21.625 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:21.625 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:22.638 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:22.638 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:22.638 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:22.638 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:22.638 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:22.638 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:22.638 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:22.638 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:22.638 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:22.639 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:22.639 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:22.639 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:22.639 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:23.905 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:23.905 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:23.905 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:23.905 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:23.905 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:23.905 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:23.905 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:23.905 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:23.905 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:23.905 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:23.905 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:23.905 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:23.905 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:25.115 D/EnglishCarRealtime(32263): websocket upgrade response=HTTP/1.1 101 Switching Protocols
+05-25 19:06:25.115 D/EnglishCarDiagnostics(32263): 19:06:25.115 Realtime: websocket upgrade HTTP/1.1 101 Switching Protocols
+05-25 19:06:25.118 D/EnglishCarRealtime(32263): websocket accept validated
+05-25 19:06:25.119 D/EnglishCarDiagnostics(32263): 19:06:25.119 Realtime: websocket accept validated
+05-25 19:06:25.121 I/EnglishCarRealtime(32263): websocket connected durationMs=7480
+05-25 19:06:25.122 D/EnglishCarDiagnostics(32263): 19:06:25.121 Realtime: websocket connected durationMs=7480
+05-25 19:06:25.123 D/EnglishCarConversation(32263): realtimeEvent=Connected
+05-25 19:06:25.124 D/EnglishCarDiagnostics(32263): 19:06:25.123 Conversation: realtimeEvent=Connected
+05-25 19:06:25.126 D/EnglishCarDiagnostics(32263): 19:06:25.125 Realtime: use backend session config
+05-25 19:06:25.127 D/EnglishCarRealtime(32263): send greeting request assistantNameLength=4
+05-25 19:06:25.129 D/EnglishCarDiagnostics(32263): 19:06:25.128 Realtime: send greeting request
+05-25 19:06:25.130 D/EnglishCarRealtime(32263): send event type=conversation.item.create
+05-25 19:06:25.131 D/EnglishCarRealtime(32263): send event type=response.create
+05-25 19:06:25.132 D/EnglishCarRealtime(32263): server event type=session.created
+05-25 19:06:25.132 D/EnglishCarConversation(32263): realtimeEvent=Listening
+05-25 19:06:25.133 D/EnglishCarDiagnostics(32263): 19:06:25.133 Conversation: realtimeEvent=Listening
+05-25 19:06:25.180 D/EnglishCarDiagnostics(32263): 19:06:25.179 Realtime: audio effects aec=true ns=true agc=false
+05-25 19:06:25.193 I/EnglishCarRealtime(32263): microphone streaming started sampleRate=24000 minBuffer=1920
+05-25 19:06:25.193 D/EnglishCarDiagnostics(32263): 19:06:25.193 Realtime: microphone streaming started sampleRate=24000 minBuffer=1920
+05-25 19:06:25.195 D/EnglishCarConversation(32263): realtimeEvent=Listening
+05-25 19:06:25.196 D/EnglishCarDiagnostics(32263): 19:06:25.195 Conversation: realtimeEvent=Listening
+05-25 19:06:25.401 D/EnglishCarRealtime(32263): server event type=conversation.item.added
+05-25 19:06:25.402 D/EnglishCarRealtime(32263): server event type=conversation.item.done
+05-25 19:06:25.994 D/EnglishCarRealtime(32263): server event type=response.created
+05-25 19:06:26.185 D/EnglishCarRealtime(32263): server event type=response.output_item.added
+05-25 19:06:26.185 D/EnglishCarRealtime(32263): server event type=conversation.item.added
+05-25 19:06:26.189 D/EnglishCarRealtime(32263): server event type=response.content_part.added
+05-25 19:06:26.190 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=3)
+05-25 19:06:26.190 D/EnglishCarDiagnostics(32263): 19:06:26.190 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 19:06:26.204 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=5)
+05-25 19:06:26.204 D/EnglishCarDiagnostics(32263): 19:06:26.204 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 19:06:26.211 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=1)
+05-25 19:06:26.213 D/EnglishCarDiagnostics(32263): 19:06:26.212 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 19:06:26.349 D/EnglishCarAudioTrack(32263): start sampleRate=24000 minBuffer=3856
+05-25 19:06:26.350 D/EnglishCarDiagnostics(32263): 19:06:26.350 AudioTrack: start sampleRate=24000 minBuffer=3856
+05-25 19:06:26.389 I/EnglishCarAudioTrack(32263): AudioTrack started bufferBytes=48000
+05-25 19:06:26.390 D/EnglishCarDiagnostics(32263): 19:06:26.390 AudioTrack: started bufferBytes=48000
+05-25 19:06:26.392 D/EnglishCarConversation(32263): realtimeEvent=Speaking
+05-25 19:06:26.393 D/EnglishCarDiagnostics(32263): 19:06:26.392 Conversation: realtimeEvent=Speaking
+05-25 19:06:26.404 D/EnglishCarDiagnostics(32263): 19:06:26.404 Realtime: drop likely assistant echo chunks=1 reason=assistant_speaking_echo avg=1324 peak=6998 speaking=true armed=false
+05-25 19:06:26.563 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=5)
+05-25 19:06:26.565 D/EnglishCarDiagnostics(32263): 19:06:26.563 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 19:06:26.569 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=1)
+05-25 19:06:26.569 D/EnglishCarDiagnostics(32263): 19:06:26.569 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 19:06:26.954 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=5)
+05-25 19:06:26.956 D/EnglishCarDiagnostics(32263): 19:06:26.955 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 19:06:26.962 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=2)
+05-25 19:06:26.962 D/EnglishCarDiagnostics(32263): 19:06:26.962 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 19:06:27.682 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=4)
+05-25 19:06:27.682 D/EnglishCarDiagnostics(32263): 19:06:27.682 Conversation: realtimeEvent=AssistantText(chars=4)
+05-25 19:06:27.686 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=4)
+05-25 19:06:27.686 D/EnglishCarDiagnostics(32263): 19:06:27.686 Conversation: realtimeEvent=AssistantText(chars=4)
+05-25 19:06:27.692 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=3)
+05-25 19:06:27.693 D/EnglishCarDiagnostics(32263): 19:06:27.693 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 19:06:27.695 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=1)
+05-25 19:06:27.695 D/EnglishCarDiagnostics(32263): 19:06:27.695 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 19:06:27.697 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=3)
+05-25 19:06:27.697 D/EnglishCarDiagnostics(32263): 19:06:27.697 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 19:06:27.699 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=2)
+05-25 19:06:27.699 D/EnglishCarDiagnostics(32263): 19:06:27.699 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 19:06:27.701 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=2)
+05-25 19:06:27.702 D/EnglishCarDiagnostics(32263): 19:06:27.702 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 19:06:27.704 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=5)
+05-25 19:06:27.704 D/EnglishCarDiagnostics(32263): 19:06:27.704 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 19:06:27.706 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=5)
+05-25 19:06:27.706 D/EnglishCarDiagnostics(32263): 19:06:27.706 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 19:06:27.708 D/EnglishCarConversation(32263): realtimeEvent=AssistantText(chars=1)
+05-25 19:06:27.708 D/EnglishCarDiagnostics(32263): 19:06:27.708 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 19:06:28.198 D/EnglishCarAudioTrack(32263): AudioTrack write heartbeat bytesWritten=96000
+05-25 19:06:28.200 D/EnglishCarDiagnostics(32263): 19:06:28.199 AudioTrack: write heartbeat bytesWritten=96000
+05-25 19:06:28.906 D/EnglishCarDiagnostics(32263): 19:06:28.904 Realtime: drop likely assistant echo chunks=51 reason=assistant_speaking_echo avg=933 peak=4412 speaking=true armed=false
+05-25 19:06:29.759 D/EnglishCarRealtime(32263): server event type=response.output_audio.done
+05-25 19:06:29.761 D/EnglishCarDiagnostics(32263): 19:06:29.760 Realtime: server audio done bytesReceived=223200
+05-25 19:06:29.769 D/EnglishCarConversation(32263): realtimeEvent=Listening
+05-25 19:06:29.770 D/EnglishCarDiagnostics(32263): 19:06:29.770 Conversation: realtimeEvent=Listening
+05-25 19:06:29.771 D/EnglishCarRealtime(32263): server event type=response.output_audio_transcript.done
+05-25 19:06:29.771 D/EnglishCarRealtime(32263): server event type=response.content_part.done
+05-25 19:06:29.772 D/EnglishCarRealtime(32263): server event type=conversation.item.done
+05-25 19:06:29.772 D/EnglishCarRealtime(32263): server event type=response.output_item.done
+05-25 19:06:29.772 D/EnglishCarRealtime(32263): server event type=response.done
+05-25 19:06:29.772 D/EnglishCarRealtime(32263): server event type=rate_limits.updated
+05-25 19:06:30.278 D/EnglishCarAudioTrack(32263): AudioTrack write heartbeat bytesWritten=192000
+05-25 19:06:30.279 D/EnglishCarDiagnostics(32263): 19:06:30.279 AudioTrack: write heartbeat bytesWritten=192000
+05-25 19:06:31.047 D/EnglishCarDiagnostics(32263): 19:06:31.046 Realtime: barge-in armed avg=2532 peak=12594 candidateMs=300
+05-25 19:06:31.245 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_started
+05-25 19:06:31.245 D/EnglishCarDiagnostics(32263): 19:06:31.245 Realtime: server speech_started
+05-25 19:06:31.249 D/EnglishCarDiagnostics(32263): 19:06:31.248 Realtime: ignore speech_started echoWindow=true armed=false active=false
+05-25 19:06:31.251 D/EnglishCarRealtime(32263): send event type=input_audio_buffer.clear
+05-25 19:06:31.252 D/EnglishCarConversation(32263): realtimeEvent=Listening
+05-25 19:06:31.252 D/EnglishCarDiagnostics(32263): 19:06:31.252 Conversation: realtimeEvent=Listening
+05-25 19:06:31.446 D/EnglishCarDiagnostics(32263): 19:06:31.445 Realtime: barge-in armed avg=2973 peak=22464 candidateMs=300
+05-25 19:06:37.267 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_stopped
+05-25 19:06:37.267 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.committed
+05-25 19:06:37.267 D/EnglishCarRealtime(32263): server event type=conversation.item.added
+05-25 19:06:37.267 D/EnglishCarRealtime(32263): server event type=conversation.item.done
+05-25 19:06:37.502 I/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.completed transcriptChars=0
+05-25 19:06:37.503 D/EnglishCarDiagnostics(32263): 19:06:37.502 Realtime: server transcription completed chars=0
+05-25 19:06:37.506 D/EnglishCarDiagnostics(32263): 19:06:37.506 Realtime: ignore transcript reason=empty chars=0 words=0 echoWindow=false
+05-25 19:06:45.094 D/EnglishCarRealtime(32263): websocket ping received payloadBytes=4
+05-25 19:06:45.095 D/EnglishCarDiagnostics(32263): 19:06:45.095 Realtime: websocket ping payloadBytes=4
+05-25 19:06:46.394 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:46.395 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:46.395 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:46.395 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:46.395 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:46.395 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:46.395 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:46.395 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:46.395 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:46.395 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:46.395 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:46.395 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:46.395 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:47.084 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_started
+05-25 19:06:47.085 D/EnglishCarDiagnostics(32263): 19:06:47.084 Realtime: server speech_started
+05-25 19:06:47.088 D/EnglishCarDiagnostics(32263): 19:06:47.088 Realtime: user speech started
+05-25 19:06:47.091 D/EnglishCarConversation(32263): realtimeEvent=Listening
+05-25 19:06:47.091 D/EnglishCarDiagnostics(32263): 19:06:47.091 Conversation: realtimeEvent=Listening
+05-25 19:06:47.094 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.cleared
+05-25 19:06:49.838 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:49.838 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:49.838 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:49.838 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:49.838 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:49.838 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:49.838 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:49.838 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:49.838 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:49.838 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:49.838 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:49.838 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:49.838 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:50.271 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_stopped
+05-25 19:06:50.272 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.committed
+05-25 19:06:50.272 D/EnglishCarRealtime(32263): server event type=conversation.item.added
+05-25 19:06:50.272 D/EnglishCarRealtime(32263): server event type=conversation.item.done
+05-25 19:06:50.715 D/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.delta
+05-25 19:06:50.721 D/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.delta
+05-25 19:06:50.726 I/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.completed transcriptChars=6
+05-25 19:06:50.727 D/EnglishCarDiagnostics(32263): 19:06:50.726 Realtime: server transcription completed chars=6
+05-25 19:06:50.730 D/EnglishCarDiagnostics(32263): 19:06:50.729 Realtime: ignore transcript reason=too_short chars=6 words=1 echoWindow=false
+05-25 19:06:52.554 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:52.556 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:52.556 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:52.556 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:52.556 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:52.556 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:52.556 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:52.556 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:52.556 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:52.556 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:52.556 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:52.556 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:52.556 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:53.564 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:06:53.564 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:06:53.564 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:06:53.564 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:06:53.564 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:06:53.564 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:06:53.564 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:06:53.564 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:06:53.564 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:06:53.564 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:06:53.564 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:06:53.564 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:06:53.564 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 19:06:54.048 D/EnglishCarRealtime(32263): microphone streaming heartbeat frames=250 bytesPerFrame=2400
+05-25 19:06:54.050 D/EnglishCarDiagnostics(32263): 19:06:54.050 Realtime: microphone heartbeat frames=250 bytesPerFrame=2400 avg=3236 peak=12727 dropped=99
+05-25 19:06:54.587 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_started
+05-25 19:06:54.588 D/EnglishCarDiagnostics(32263): 19:06:54.587 Realtime: server speech_started
+05-25 19:06:54.590 D/EnglishCarDiagnostics(32263): 19:06:54.589 Realtime: user speech started
+05-25 19:06:54.591 D/EnglishCarConversation(32263): realtimeEvent=Listening
+05-25 19:06:54.591 D/EnglishCarDiagnostics(32263): 19:06:54.591 Conversation: realtimeEvent=Listening
+05-25 19:06:55.253 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_stopped
+05-25 19:06:55.253 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.committed
+05-25 19:06:55.254 D/EnglishCarRealtime(32263): server event type=conversation.item.added
+05-25 19:06:55.254 D/EnglishCarRealtime(32263): server event type=conversation.item.done
+05-25 19:06:55.666 D/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.delta
+05-25 19:06:55.675 D/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.delta
+05-25 19:06:55.682 D/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.delta
+05-25 19:06:55.688 I/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.completed transcriptChars=11
+05-25 19:06:55.689 D/EnglishCarDiagnostics(32263): 19:06:55.688 Realtime: server transcription completed chars=11
+05-25 19:06:55.692 D/EnglishCarDiagnostics(32263): 19:06:55.692 Realtime: accept transcript chars=11 words=1
+05-25 19:06:55.695 D/EnglishCarConversation(32263): realtimeEvent=Transcript(chars=11)
+05-25 19:06:55.696 D/EnglishCarDiagnostics(32263): 19:06:55.695 Conversation: realtimeEvent=Transcript(chars=11)
+05-25 19:06:55.699 D/EnglishCarDiagnostics(32263): 19:06:55.699 Realtime: send response.create after transcript
+05-25 19:06:55.701 D/EnglishCarRealtime(32263): send event type=response.create
+05-25 19:06:55.991 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_started
+05-25 19:06:55.992 D/EnglishCarDiagnostics(32263): 19:06:55.991 Realtime: server speech_started
+05-25 19:06:55.995 D/EnglishCarDiagnostics(32263): 19:06:55.995 Realtime: user speech started
+05-25 19:06:55.998 D/EnglishCarConversation(32263): realtimeEvent=Listening
+05-25 19:06:56.003 D/EnglishCarDiagnostics(32263): 19:06:56.003 Conversation: realtimeEvent=Listening
+05-25 19:06:57.907 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.speech_stopped
+05-25 19:06:57.908 D/EnglishCarRealtime(32263): server event type=input_audio_buffer.committed
+05-25 19:06:57.908 D/EnglishCarRealtime(32263): server event type=conversation.item.added
+05-25 19:06:57.908 D/EnglishCarRealtime(32263): server event type=conversation.item.done
+05-25 19:06:58.379 D/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.delta
+05-25 19:06:58.385 I/EnglishCarRealtime(32263): server event type=conversation.item.input_audio_transcription.completed transcriptChars=3
+05-25 19:06:58.386 D/EnglishCarDiagnostics(32263): 19:06:58.385 Realtime: server transcription completed chars=3
+05-25 19:06:58.388 D/EnglishCarDiagnostics(32263): 19:06:58.388 Realtime: ignore transcript reason=too_short chars=3 words=1 echoWindow=false
+05-25 19:07:02.646 D/EnglishCarRealtime(32263): session heartbeat ageMs=45005 framesSent=366 audioBytesReceived=223200 socketOpen=true
+05-25 19:07:02.648 D/EnglishCarDiagnostics(32263): 19:07:02.647 Realtime: heartbeat ageMs=45005 framesSent=366 audioBytesReceived=223200 socketOpen=true
+05-25 19:07:16.299 D/EnglishCarRealtime(32263): websocket ping received payloadBytes=4
+05-25 19:07:16.300 D/EnglishCarDiagnostics(32263): 19:07:16.300 Realtime: websocket ping payloadBytes=4
+05-25 19:07:16.640 D/EnglishCarConversation(32263): finish
+05-25 19:07:16.641 D/EnglishCarDiagnostics(32263): 19:07:16.640 Conversation: finish
+05-25 19:07:16.642 D/EnglishCarDiagnostics(32263): 19:07:16.642 AudioFocus: abandon start hasRequest=true
+05-25 19:07:16.646 D/EnglishCarDiagnostics(32263): 19:07:16.646 AudioFocus: abandon done
+05-25 19:07:16.647 I/EnglishCarRealtime(32263): stop sessionAgeMs=59006 audioFramesSent=384 audioBytesReceived=223200
+05-25 19:07:16.648 D/EnglishCarDiagnostics(32263): 19:07:16.647 Realtime: stop ageMs=59006 framesSent=384 audioBytesReceived=223200
+05-25 19:07:18.773 I/EnglishCarAudioTrack(32263): AudioTrack stop bytesWritten=223200
+05-25 19:07:18.773 D/EnglishCarDiagnostics(32263): 19:07:18.773 AudioTrack: stop bytesWritten=223200
+05-25 19:07:18.774 D/EnglishCarRealtime(32263): Realtime recording cancelled
+05-25 19:07:18.776 D/EnglishCarDiagnostics(32263): 19:07:18.775 Realtime: recording cancelled
+05-25 19:07:18.779 D/EnglishCarDiagnostics(32263): 19:07:18.779 WebRTC: stop
+05-25 19:07:18.781 D/EnglishCarDiagnostics(32263): 19:07:18.781 Speech: stopListening
+05-25 19:07:18.782 D/EnglishCarDiagnostics(32263): 19:07:18.782 TTS: stop requested
+05-25 19:07:18.785 D/EnglishCarDiagnostics(32263): 19:07:18.785 ServiceCtl: stop requested
+05-25 19:07:18.789 D/EnglishCarDiagnostics(32263): 19:07:18.789 ServiceCtl: stop requested
+05-25 19:07:18.810 D/EnglishCarDiagnostics(32263): 19:07:18.810 Service: onDestroy
+05-25 19:08:17.337 D/EnglishCarDiagnostics(32263): 19:08:17.337 Activity: onStop

@@ -757,17 +757,14 @@ Este timeout indica cuanto espera Android despues de que el usuario deja de habl
 Opciones recomendadas:
 
 ```text
-750 ms
-1000 ms
-1500 ms
-2000 ms
-3000 ms
+500 ms a 5000 ms
+Incrementos de 100 ms
 ```
 
 Valor por defecto:
 
 ```text
-1500 ms
+3500 ms
 ```
 
 Objetivo:
@@ -775,6 +772,8 @@ Objetivo:
 - Usuarios rapidos tienen menor latencia.
 - Usuarios pausados tienen mas comodidad.
 - La conversacion se siente natural.
+- La UI debe mostrar este valor en segundos con un decimal, por ejemplo `1.6s`.
+- El maximo de este control es 5 segundos; no confundir con Auto pause, que puede llegar a 5 minutos.
 
 ### Auto pausa por inactividad
 
@@ -1122,6 +1121,28 @@ Reglas:
 - No reiniciar el microfono cada pocos segundos durante espera silenciosa.
 - Usar `en-US`.
 - Si no hay frase util, seguir escuchando sin convertirlo en error fatal.
+
+### Mejora futura: barge-in
+
+En una fase posterior se podra permitir que el usuario hable mientras el asistente esta hablando.
+
+Objetivo:
+
+- Mantener el microfono activo durante TTS.
+- Permitir interrumpir al asistente por voz.
+- Permitir comandos como Pause, Finish o Close app mientras el asistente habla.
+- Permitir que el usuario complete una idea si el asistente empezo a responder demasiado pronto.
+
+Riesgos a resolver antes de implementarlo:
+
+- El microfono puede captar la propia voz del asistente por los parlantes.
+- La app podria transcribir la respuesta del asistente como si fuera del usuario.
+- Se requiere mitigacion con cancelacion de eco, deteccion de similitud contra el ultimo texto hablado y reglas especiales durante Speaking.
+
+Estado:
+
+- No implementado en esta version.
+- Considerarlo despues de estabilizar la captura continua, latencia y uso con Android Auto.
 
 ### Google TTS
 

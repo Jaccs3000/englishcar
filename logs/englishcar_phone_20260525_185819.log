@@ -1,0 +1,442 @@
+--------- beginning of main
+05-25 18:58:18.778 D/EnglishCarDiagnostics(30781): 18:58:18.776 Activity: onCreate
+05-25 18:58:18.812 D/EnglishCarDiagnostics(30781): 18:58:18.811 Activity: onStart
+05-25 18:58:19.015 D/EnglishCarDiagnostics(30781): 18:58:19.014 TTS: warmUp requested
+05-25 18:58:19.019 D/EnglishCarDiagnostics(30781): 18:58:19.018 TTS: ensureReady init start
+05-25 18:58:20.085 D/EnglishCarDiagnostics(30781): 18:58:20.084 Activity: onStop
+05-25 18:58:20.841 D/EnglishCarDiagnostics(30781): 18:58:20.840 TTS: ensureReady init result status=0 ready=true
+05-25 18:58:21.111 D/EnglishCarDiagnostics(30781): 18:58:21.110 Activity: onStart
+05-25 18:58:25.826 D/EnglishCarDiagnostics(30781): 18:58:25.826 ServiceCtl: stop requested
+05-25 18:58:25.830 D/EnglishCarDiagnostics(30781): 18:58:25.830 Activity: finishAndRemoveTask requested
+05-25 18:58:26.255 D/EnglishCarDiagnostics(30781): 18:58:26.254 Activity: onStop
+05-25 18:58:26.316 D/EnglishCarDiagnostics(30781): 18:58:26.316 Activity: onDestroy finishing=true changingConfig=false
+05-25 18:58:55.605 D/EnglishCarDiagnostics(30781): 18:58:55.604 Activity: onCreate
+05-25 18:58:55.622 D/EnglishCarDiagnostics(30781): 18:58:55.622 Activity: onStart
+05-25 18:58:55.673 D/EnglishCarDiagnostics(30781): 18:58:55.672 TTS: warmUp requested
+05-25 18:58:55.676 D/EnglishCarDiagnostics(30781): 18:58:55.675 TTS: ensureReady await existing
+05-25 18:58:57.447 D/EnglishCarDiagnostics(30781): 18:58:57.446 Backend: fetchModels start host=english-car-backend.jaccs3000.workers.dev
+05-25 18:58:57.848 D/EnglishCarDiagnostics(30781): 18:58:57.848 Backend: fetchModels success count=3 default=gpt-5-mini
+05-25 18:59:03.517 D/EnglishCarDiagnostics(30781): 18:59:03.516 MainVM: startConversation permission=true
+05-25 18:59:03.521 D/EnglishCarDiagnostics(30781): 18:59:03.521 MainVM: start service before conversation
+05-25 18:59:03.523 D/EnglishCarDiagnostics(30781): 18:59:03.523 ServiceCtl: start requested
+05-25 18:59:03.528 D/EnglishCarDiagnostics(30781): 18:59:03.528 ServiceCtl: start dispatched
+05-25 18:59:03.531 D/EnglishCarDiagnostics(30781): 18:59:03.530 MainVM: call conversationManager.start
+05-25 18:59:03.533 D/EnglishCarConversation(30781): start permission=true
+05-25 18:59:03.533 D/EnglishCarDiagnostics(30781): 18:59:03.533 Conversation: start permission=true
+05-25 18:59:03.536 D/EnglishCarDiagnostics(30781): 18:59:03.535 AudioFocus: request start sdk=35
+05-25 18:59:03.543 D/EnglishCarDiagnostics(30781): 18:59:03.543 AudioFocus: request result=1 granted=true
+05-25 18:59:03.558 D/EnglishCarDiagnostics(30781): 18:59:03.557 Service: onCreate
+05-25 18:59:03.561 D/EnglishCarDiagnostics(30781): 18:59:03.561 Service: startForeground state=Idle
+05-25 18:59:03.573 D/EnglishCarDiagnostics(30781): 18:59:03.573 Service: onStartCommand action=start state=Idle
+05-25 18:59:03.575 D/EnglishCarDiagnostics(30781): 18:59:03.575 Service: startForeground state=Idle
+05-25 18:59:03.589 I/EnglishCarConversation(30781): start mode=RealtimeExperimental assistant=emma
+05-25 18:59:03.589 D/EnglishCarDiagnostics(30781): 18:59:03.589 Conversation: start mode=RealtimeExperimental assistant=emma
+05-25 18:59:03.591 I/EnglishCarConversation(30781): startRealtime assistant=emma
+05-25 18:59:03.591 D/EnglishCarDiagnostics(30781): 18:59:03.591 Conversation: startRealtime assistant=emma
+05-25 18:59:03.594 D/EnglishCarDiagnostics(30781): 18:59:03.593 Conversation: startRealtimeTransport transport=WebRtc
+05-25 18:59:03.595 D/EnglishCarDiagnostics(30781): 18:59:03.595 WebRTC: start assistant=emma
+05-25 18:59:03.597 D/EnglishCarDiagnostics(30781): 18:59:03.597 WebRTC: stop
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): WebRTC start failed
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): java.lang.NoClassDefFoundError: Failed resolution of: Lorg/webrtc/Environment;
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(PeerConnectionFactory.java:166)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(Unknown Source:0)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at org.webrtc.PeerConnectionFactory.builder(PeerConnectionFactory.java:295)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.buildPeerConnection(RealtimeWebRtcVoiceClient.kt:153)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.start(RealtimeWebRtcVoiceClient.kt:78)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtimeTransport(ConversationManager.kt:246)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtime(ConversationManager.kt:213)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.englishcar.voicecoach.conversation.ConversationManager.access$startRealtime(ConversationManager.kt:42)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.englishcar.voicecoach.conversation.ConversationManager$start$3.invokeSuspend(ConversationManager.kt:143)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith(DispatchedContinuation.kt:367)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith$default(DispatchedContinuation.kt:278)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.internal.ScopeCoroutine.afterCompletion(Scopes.kt:27)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.continueCompleting(JobSupport.kt:940)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.access$continueCompleting(JobSupport.kt:25)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport$ChildCompletion.invoke(JobSupport.kt:1159)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.notifyCompletion(JobSupport.kt:1497)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.completeStateFinalization(JobSupport.kt:325)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.finalizeFinishingState(JobSupport.kt:242)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.tryMakeCompletingSlowPath(JobSupport.kt:910)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.tryMakeCompleting(JobSupport.kt:867)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.JobSupport.makeCompletingOnce$kotlinx_coroutines_core(JobSupport.kt:832)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:108)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at android.os.Handler.handleCallback(Handler.java:1001)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at android.os.Handler.dispatchMessage(Handler.java:105)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at android.os.Looper.loop(Looper.java:384)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): Caused by: java.lang.ClassNotFoundException: Didn't find class "org.webrtc.Environment" on path: DexPathList[[zip file "/data/app/~~2IiiBi0ISFb_Zpjn5FQLqw==/com.englishcar.voicecoach-imOOkWaagEVi-4RDX3RmUw==/base.apk"],nativeLibraryDirectories=[/data/app/~~2IiiBi0ISFb_Zpjn5FQLqw==/com.englishcar.voicecoach-imOOkWaagEVi-4RDX3RmUw==/lib/arm64, /data/app/~~2IiiBi0ISFb_Zpjn5FQLqw==/com.englishcar.voicecoach-imOOkWaagEVi-4RDX3RmUw==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:642)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:578)
+05-25 18:59:03.623 E/EnglishCarWebRTC(30781): 	... 33 more
+05-25 18:59:03.624 D/EnglishCarDiagnostics(30781): 18:59:03.624 WebRTC: start failed NoClassDefFoundError message=Failed resolution of: Lorg/webrtc/Environment;
+05-25 18:59:03.625 D/EnglishCarDiagnostics(30781): 18:59:03.625 WebRTC: stop
+05-25 18:59:03.627 D/EnglishCarConversation(30781): realtimeEvent=Failed(messageLength=23)
+05-25 18:59:03.627 D/EnglishCarDiagnostics(30781): 18:59:03.627 Conversation: realtimeEvent=Failed(messageLength=23)
+05-25 18:59:03.629 D/EnglishCarDiagnostics(30781): 18:59:03.628 Conversation: fallback WebRTC to WebSocket
+05-25 18:59:03.630 D/EnglishCarDiagnostics(30781): 18:59:03.630 WebRTC: stop
+05-25 18:59:03.671 D/EnglishCarDiagnostics(30781): 18:59:03.671 Conversation: startRealtimeTransport transport=WebSocket
+05-25 18:59:03.672 I/EnglishCarRealtime(30781): start assistantId=emma mode=realtime
+05-25 18:59:03.673 D/EnglishCarDiagnostics(30781): 18:59:03.673 Realtime: start assistant=emma
+05-25 18:59:03.677 D/EnglishCarRealtime(30781): requesting realtime client secret backendHost=english-car-backend.jaccs3000.workers.dev
+05-25 18:59:03.677 D/EnglishCarDiagnostics(30781): 18:59:03.677 Realtime: request client secret host=english-car-backend.jaccs3000.workers.dev
+05-25 18:59:03.679 D/EnglishCarBackendClient(30781): createRealtimeClientSecret host=english-car-backend.jaccs3000.workers.dev assistant=emma voice=shimmer
+05-25 18:59:03.680 D/EnglishCarDiagnostics(30781): 18:59:03.680 Backend: realtime secret start host=english-car-backend.jaccs3000.workers.dev assistant=emma voice=shimmer
+05-25 18:59:04.705 I/EnglishCarBackendClient(30781): createRealtimeClientSecret success durationMs=1026 expiresAt=1779754145
+05-25 18:59:04.706 D/EnglishCarDiagnostics(30781): 18:59:04.706 Backend: realtime secret success durationMs=1027 expiresAt=1779754145
+05-25 18:59:04.711 I/EnglishCarRealtime(30781): realtime client secret received durationMs=1034 expiresAt=1779754145
+05-25 18:59:04.712 D/EnglishCarDiagnostics(30781): 18:59:04.711 Realtime: client secret received durationMs=1034
+05-25 18:59:04.715 D/EnglishCarRealtime(30781): websocket connecting host=api.openai.com
+05-25 18:59:04.716 D/EnglishCarDiagnostics(30781): 18:59:04.716 Realtime: websocket connecting
+05-25 18:59:04.822 D/EnglishCarRealtime(30781): tls handshake complete protocol=TLSv1.3
+05-25 18:59:04.823 D/EnglishCarDiagnostics(30781): 18:59:04.823 Realtime: tls handshake protocol=TLSv1.3
+05-25 18:59:06.963 D/EnglishCarRealtime(30781): websocket upgrade response=HTTP/1.1 101 Switching Protocols
+05-25 18:59:06.964 D/EnglishCarDiagnostics(30781): 18:59:06.963 Realtime: websocket upgrade HTTP/1.1 101 Switching Protocols
+05-25 18:59:06.967 D/EnglishCarRealtime(30781): websocket accept validated
+05-25 18:59:06.968 D/EnglishCarDiagnostics(30781): 18:59:06.968 Realtime: websocket accept validated
+05-25 18:59:06.969 I/EnglishCarRealtime(30781): websocket connected durationMs=2255
+05-25 18:59:06.970 D/EnglishCarDiagnostics(30781): 18:59:06.969 Realtime: websocket connected durationMs=2255
+05-25 18:59:06.971 D/EnglishCarConversation(30781): realtimeEvent=Connected
+05-25 18:59:06.971 D/EnglishCarDiagnostics(30781): 18:59:06.971 Conversation: realtimeEvent=Connected
+05-25 18:59:06.973 D/EnglishCarDiagnostics(30781): 18:59:06.972 Realtime: use backend session config
+05-25 18:59:06.974 D/EnglishCarRealtime(30781): send greeting request assistantNameLength=4
+05-25 18:59:06.974 D/EnglishCarDiagnostics(30781): 18:59:06.974 Realtime: send greeting request
+05-25 18:59:06.975 D/EnglishCarRealtime(30781): send event type=conversation.item.create
+05-25 18:59:06.976 D/EnglishCarRealtime(30781): send event type=response.create
+05-25 18:59:06.978 D/EnglishCarRealtime(30781): server event type=session.created
+05-25 18:59:06.978 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:06.978 D/EnglishCarDiagnostics(30781): 18:59:06.978 Conversation: realtimeEvent=Listening
+05-25 18:59:07.039 D/EnglishCarDiagnostics(30781): 18:59:07.039 Realtime: audio effects aec=true ns=true agc=false
+05-25 18:59:07.052 I/EnglishCarRealtime(30781): microphone streaming started sampleRate=24000 minBuffer=1920
+05-25 18:59:07.054 D/EnglishCarDiagnostics(30781): 18:59:07.053 Realtime: microphone streaming started sampleRate=24000 minBuffer=1920
+05-25 18:59:07.056 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:07.057 D/EnglishCarDiagnostics(30781): 18:59:07.057 Conversation: realtimeEvent=Listening
+05-25 18:59:07.189 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:07.189 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:07.221 D/EnglishCarRealtime(30781): server event type=response.created
+05-25 18:59:07.400 D/EnglishCarRealtime(30781): server event type=response.output_item.added
+05-25 18:59:07.400 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:07.422 D/EnglishCarRealtime(30781): server event type=response.content_part.added
+05-25 18:59:07.422 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:07.423 D/EnglishCarDiagnostics(30781): 18:59:07.422 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:07.425 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:07.425 D/EnglishCarDiagnostics(30781): 18:59:07.425 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:07.431 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:07.432 D/EnglishCarDiagnostics(30781): 18:59:07.431 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:07.509 D/EnglishCarAudioTrack(30781): start sampleRate=24000 minBuffer=3856
+05-25 18:59:07.510 D/EnglishCarDiagnostics(30781): 18:59:07.510 AudioTrack: start sampleRate=24000 minBuffer=3856
+05-25 18:59:07.639 I/EnglishCarAudioTrack(30781): AudioTrack started bufferBytes=48000
+05-25 18:59:07.641 D/EnglishCarDiagnostics(30781): 18:59:07.640 AudioTrack: started bufferBytes=48000
+05-25 18:59:07.644 D/EnglishCarConversation(30781): realtimeEvent=Speaking
+05-25 18:59:07.644 D/EnglishCarDiagnostics(30781): 18:59:07.644 Conversation: realtimeEvent=Speaking
+05-25 18:59:07.673 D/EnglishCarDiagnostics(30781): 18:59:07.673 Realtime: drop likely assistant echo chunks=1 reason=assistant_echo avg=2797 peak=8324 speaking=true armed=false
+05-25 18:59:07.687 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:07.688 D/EnglishCarDiagnostics(30781): 18:59:07.687 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:07.690 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:07.690 D/EnglishCarDiagnostics(30781): 18:59:07.690 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:07.801 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:07.801 D/EnglishCarDiagnostics(30781): 18:59:07.801 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:07.806 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=2)
+05-25 18:59:07.806 D/EnglishCarDiagnostics(30781): 18:59:07.806 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 18:59:07.810 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=2)
+05-25 18:59:07.810 D/EnglishCarDiagnostics(30781): 18:59:07.810 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 18:59:07.813 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:07.813 D/EnglishCarDiagnostics(30781): 18:59:07.813 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:07.815 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:07.816 D/EnglishCarDiagnostics(30781): 18:59:07.815 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:08.067 D/EnglishCarRealtime(30781): server event type=response.output_audio.done
+05-25 18:59:08.067 D/EnglishCarDiagnostics(30781): 18:59:08.067 Realtime: server audio done bytesReceived=139200
+05-25 18:59:08.068 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:08.069 D/EnglishCarDiagnostics(30781): 18:59:08.068 Conversation: realtimeEvent=Listening
+05-25 18:59:08.070 D/EnglishCarRealtime(30781): server event type=response.output_audio_transcript.done
+05-25 18:59:08.070 D/EnglishCarRealtime(30781): server event type=response.content_part.done
+05-25 18:59:08.071 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:08.071 D/EnglishCarRealtime(30781): server event type=response.output_item.done
+05-25 18:59:08.071 D/EnglishCarRealtime(30781): server event type=response.done
+05-25 18:59:08.083 D/EnglishCarRealtime(30781): server event type=rate_limits.updated
+05-25 18:59:08.475 D/EnglishCarDiagnostics(30781): 18:59:08.474 Realtime: barge-in armed avg=4145 peak=20126 candidateMs=300
+05-25 18:59:08.729 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_started
+05-25 18:59:08.730 D/EnglishCarDiagnostics(30781): 18:59:08.729 Realtime: server speech_started
+05-25 18:59:08.733 D/EnglishCarDiagnostics(30781): 18:59:08.733 Realtime: ignore speech_started echoWindow=true armed=false active=false
+05-25 18:59:08.736 D/EnglishCarRealtime(30781): send event type=input_audio_buffer.clear
+05-25 18:59:08.736 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:08.737 D/EnglishCarDiagnostics(30781): 18:59:08.737 Conversation: realtimeEvent=Listening
+05-25 18:59:08.947 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.cleared
+05-25 18:59:09.015 D/EnglishCarDiagnostics(30781): 18:59:09.014 Realtime: barge-in armed avg=2642 peak=8234 candidateMs=300
+05-25 18:59:09.747 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_stopped
+05-25 18:59:09.747 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.committed
+05-25 18:59:09.752 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:09.752 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:10.230 I/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.completed transcriptChars=0
+05-25 18:59:10.231 D/EnglishCarDiagnostics(30781): 18:59:10.231 Realtime: server transcription completed chars=0
+05-25 18:59:10.234 D/EnglishCarDiagnostics(30781): 18:59:10.234 Realtime: ignore transcript reason=empty chars=0 words=0 echoWindow=false
+05-25 18:59:15.693 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_started
+05-25 18:59:15.694 D/EnglishCarDiagnostics(30781): 18:59:15.694 Realtime: server speech_started
+05-25 18:59:15.697 D/EnglishCarDiagnostics(30781): 18:59:15.697 Realtime: user speech started
+05-25 18:59:15.700 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:15.700 D/EnglishCarDiagnostics(30781): 18:59:15.700 Conversation: realtimeEvent=Listening
+05-25 18:59:16.399 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_stopped
+05-25 18:59:16.399 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.committed
+05-25 18:59:16.399 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:16.399 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:16.849 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:16.850 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:16.863 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:16.864 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:16.864 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:16.877 I/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.completed transcriptChars=16
+05-25 18:59:16.877 D/EnglishCarDiagnostics(30781): 18:59:16.877 Realtime: server transcription completed chars=16
+05-25 18:59:16.883 D/EnglishCarDiagnostics(30781): 18:59:16.882 Realtime: accept transcript chars=16 words=4
+05-25 18:59:16.885 D/EnglishCarConversation(30781): realtimeEvent=Transcript(chars=16)
+05-25 18:59:16.886 D/EnglishCarDiagnostics(30781): 18:59:16.886 Conversation: realtimeEvent=Transcript(chars=16)
+05-25 18:59:16.889 D/EnglishCarDiagnostics(30781): 18:59:16.889 Realtime: send response.create after transcript
+05-25 18:59:16.890 D/EnglishCarRealtime(30781): send event type=response.create
+05-25 18:59:17.119 D/EnglishCarRealtime(30781): server event type=response.created
+05-25 18:59:17.362 D/EnglishCarRealtime(30781): server event type=response.output_item.added
+05-25 18:59:17.363 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:17.378 D/EnglishCarRealtime(30781): server event type=response.content_part.added
+05-25 18:59:17.379 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.380 D/EnglishCarDiagnostics(30781): 18:59:17.379 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.384 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.385 D/EnglishCarDiagnostics(30781): 18:59:17.384 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.453 D/EnglishCarConversation(30781): realtimeEvent=Speaking
+05-25 18:59:17.454 D/EnglishCarDiagnostics(30781): 18:59:17.453 Conversation: realtimeEvent=Speaking
+05-25 18:59:17.639 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.639 D/EnglishCarDiagnostics(30781): 18:59:17.639 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.642 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.642 D/EnglishCarDiagnostics(30781): 18:59:17.642 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.645 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=4)
+05-25 18:59:17.645 D/EnglishCarDiagnostics(30781): 18:59:17.645 Conversation: realtimeEvent=AssistantText(chars=4)
+05-25 18:59:17.649 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.649 D/EnglishCarDiagnostics(30781): 18:59:17.649 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.651 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=4)
+05-25 18:59:17.652 D/EnglishCarDiagnostics(30781): 18:59:17.651 Conversation: realtimeEvent=AssistantText(chars=4)
+05-25 18:59:17.731 D/EnglishCarAudioTrack(30781): AudioTrack write heartbeat bytesWritten=101280
+05-25 18:59:17.733 D/EnglishCarDiagnostics(30781): 18:59:17.732 AudioTrack: write heartbeat bytesWritten=101280
+05-25 18:59:17.743 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.744 D/EnglishCarDiagnostics(30781): 18:59:17.744 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.749 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:17.750 D/EnglishCarDiagnostics(30781): 18:59:17.749 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:17.752 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.753 D/EnglishCarDiagnostics(30781): 18:59:17.753 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.910 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:17.911 D/EnglishCarDiagnostics(30781): 18:59:17.910 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:17.913 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.914 D/EnglishCarDiagnostics(30781): 18:59:17.913 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.920 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.920 D/EnglishCarDiagnostics(30781): 18:59:17.920 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:17.922 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=2)
+05-25 18:59:17.922 D/EnglishCarDiagnostics(30781): 18:59:17.922 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 18:59:17.924 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.924 D/EnglishCarDiagnostics(30781): 18:59:17.924 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:17.929 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:17.929 D/EnglishCarDiagnostics(30781): 18:59:17.929 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:18.139 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=2)
+05-25 18:59:18.139 D/EnglishCarDiagnostics(30781): 18:59:18.139 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 18:59:18.144 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:18.144 D/EnglishCarDiagnostics(30781): 18:59:18.144 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:18.146 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:18.147 D/EnglishCarDiagnostics(30781): 18:59:18.146 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:18.316 D/EnglishCarDiagnostics(30781): 18:59:18.314 Realtime: barge-in armed avg=2148 peak=10571 candidateMs=300
+05-25 18:59:18.372 D/EnglishCarRealtime(30781): server event type=response.output_audio.done
+05-25 18:59:18.374 D/EnglishCarDiagnostics(30781): 18:59:18.373 Realtime: server audio done bytesReceived=372000
+05-25 18:59:18.379 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:18.381 D/EnglishCarDiagnostics(30781): 18:59:18.380 Conversation: realtimeEvent=Listening
+05-25 18:59:18.385 D/EnglishCarRealtime(30781): server event type=response.output_audio_transcript.done
+05-25 18:59:18.385 D/EnglishCarRealtime(30781): server event type=response.content_part.done
+05-25 18:59:18.385 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:18.385 D/EnglishCarRealtime(30781): server event type=response.output_item.done
+05-25 18:59:18.386 D/EnglishCarRealtime(30781): server event type=response.done
+05-25 18:59:18.386 D/EnglishCarRealtime(30781): server event type=rate_limits.updated
+05-25 18:59:18.590 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_started
+05-25 18:59:18.590 D/EnglishCarDiagnostics(30781): 18:59:18.590 Realtime: server speech_started
+05-25 18:59:18.594 D/EnglishCarDiagnostics(30781): 18:59:18.593 Realtime: ignore speech_started echoWindow=true armed=false active=false
+05-25 18:59:18.596 D/EnglishCarRealtime(30781): send event type=input_audio_buffer.clear
+05-25 18:59:18.597 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:18.598 D/EnglishCarDiagnostics(30781): 18:59:18.597 Conversation: realtimeEvent=Listening
+05-25 18:59:18.675 D/EnglishCarDiagnostics(30781): 18:59:18.674 Realtime: drop likely assistant echo chunks=51 reason=assistant_echo avg=1402 peak=4282 speaking=false armed=false
+05-25 18:59:18.806 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.cleared
+05-25 18:59:19.275 D/EnglishCarDiagnostics(30781): 18:59:19.274 Realtime: barge-in armed avg=4625 peak=22808 candidateMs=300
+05-25 18:59:19.715 D/EnglishCarDiagnostics(30781): 18:59:19.714 Realtime: barge-in armed avg=2008 peak=6034 candidateMs=300
+05-25 18:59:20.537 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_stopped
+05-25 18:59:20.538 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.committed
+05-25 18:59:20.538 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:20.538 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:20.985 I/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.completed transcriptChars=0
+05-25 18:59:20.986 D/EnglishCarDiagnostics(30781): 18:59:20.986 Realtime: server transcription completed chars=0
+05-25 18:59:20.989 D/EnglishCarDiagnostics(30781): 18:59:20.989 Realtime: ignore transcript reason=empty chars=0 words=0 echoWindow=false
+05-25 18:59:23.278 D/EnglishCarRealtime(30781): microphone streaming heartbeat frames=250 bytesPerFrame=2400
+05-25 18:59:23.281 D/EnglishCarDiagnostics(30781): 18:59:23.279 Realtime: microphone heartbeat frames=250 bytesPerFrame=2400 avg=2311 peak=16682 dropped=73
+05-25 18:59:24.093 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_started
+05-25 18:59:24.093 D/EnglishCarDiagnostics(30781): 18:59:24.093 Realtime: server speech_started
+05-25 18:59:24.098 D/EnglishCarDiagnostics(30781): 18:59:24.096 Realtime: user speech started
+05-25 18:59:24.101 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:24.101 D/EnglishCarDiagnostics(30781): 18:59:24.101 Conversation: realtimeEvent=Listening
+05-25 18:59:25.396 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_stopped
+05-25 18:59:25.396 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.committed
+05-25 18:59:25.397 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:25.397 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:25.850 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:25.850 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:25.857 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:25.865 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:25.866 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:25.955 I/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.completed transcriptChars=17
+05-25 18:59:25.956 D/EnglishCarDiagnostics(30781): 18:59:25.956 Realtime: server transcription completed chars=17
+05-25 18:59:25.962 D/EnglishCarDiagnostics(30781): 18:59:25.961 Realtime: accept transcript chars=17 words=4
+05-25 18:59:25.964 D/EnglishCarConversation(30781): realtimeEvent=Transcript(chars=17)
+05-25 18:59:25.965 D/EnglishCarDiagnostics(30781): 18:59:25.964 Conversation: realtimeEvent=Transcript(chars=17)
+05-25 18:59:25.967 D/EnglishCarDiagnostics(30781): 18:59:25.967 Realtime: send response.create after transcript
+05-25 18:59:25.969 D/EnglishCarRealtime(30781): send event type=response.create
+05-25 18:59:26.185 D/EnglishCarRealtime(30781): server event type=response.created
+05-25 18:59:26.451 D/EnglishCarRealtime(30781): server event type=response.output_item.added
+05-25 18:59:26.451 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:26.468 D/EnglishCarRealtime(30781): server event type=response.content_part.added
+05-25 18:59:26.469 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:26.469 D/EnglishCarDiagnostics(30781): 18:59:26.469 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:26.478 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:26.479 D/EnglishCarDiagnostics(30781): 18:59:26.478 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:26.554 D/EnglishCarConversation(30781): realtimeEvent=Speaking
+05-25 18:59:26.555 D/EnglishCarDiagnostics(30781): 18:59:26.554 Conversation: realtimeEvent=Speaking
+05-25 18:59:26.737 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=4)
+05-25 18:59:26.737 D/EnglishCarDiagnostics(30781): 18:59:26.737 Conversation: realtimeEvent=AssistantText(chars=4)
+05-25 18:59:26.740 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:26.741 D/EnglishCarDiagnostics(30781): 18:59:26.740 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:26.743 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=6)
+05-25 18:59:26.744 D/EnglishCarDiagnostics(30781): 18:59:26.744 Conversation: realtimeEvent=AssistantText(chars=6)
+05-25 18:59:26.837 D/EnglishCarAudioTrack(30781): AudioTrack write heartbeat bytesWritten=192000
+05-25 18:59:26.839 D/EnglishCarDiagnostics(30781): 18:59:26.838 AudioTrack: write heartbeat bytesWritten=192000
+05-25 18:59:26.902 D/EnglishCarRealtime(30781): websocket ping received payloadBytes=4
+05-25 18:59:26.903 D/EnglishCarDiagnostics(30781): 18:59:26.902 Realtime: websocket ping payloadBytes=4
+05-25 18:59:26.907 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=5)
+05-25 18:59:26.907 D/EnglishCarDiagnostics(30781): 18:59:26.907 Conversation: realtimeEvent=AssistantText(chars=5)
+05-25 18:59:26.911 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:26.912 D/EnglishCarDiagnostics(30781): 18:59:26.911 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:26.916 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:26.917 D/EnglishCarDiagnostics(30781): 18:59:26.917 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:26.989 D/EnglishCarAudioTrack(30781): AudioTrack write heartbeat bytesWritten=199680
+05-25 18:59:26.991 D/EnglishCarDiagnostics(30781): 18:59:26.990 AudioTrack: write heartbeat bytesWritten=199680
+05-25 18:59:27.062 D/EnglishCarAudioTrack(30781): AudioTrack write heartbeat bytesWritten=201600
+05-25 18:59:27.063 D/EnglishCarDiagnostics(30781): 18:59:27.062 AudioTrack: write heartbeat bytesWritten=201600
+05-25 18:59:27.128 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:27.131 D/EnglishCarDiagnostics(30781): 18:59:27.130 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:27.139 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=2)
+05-25 18:59:27.141 D/EnglishCarDiagnostics(30781): 18:59:27.140 Conversation: realtimeEvent=AssistantText(chars=2)
+05-25 18:59:27.147 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=3)
+05-25 18:59:27.149 D/EnglishCarDiagnostics(30781): 18:59:27.148 Conversation: realtimeEvent=AssistantText(chars=3)
+05-25 18:59:27.154 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=7)
+05-25 18:59:27.154 D/EnglishCarDiagnostics(30781): 18:59:27.154 Conversation: realtimeEvent=AssistantText(chars=7)
+05-25 18:59:27.156 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=4)
+05-25 18:59:27.156 D/EnglishCarDiagnostics(30781): 18:59:27.156 Conversation: realtimeEvent=AssistantText(chars=4)
+05-25 18:59:27.158 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=4)
+05-25 18:59:27.158 D/EnglishCarDiagnostics(30781): 18:59:27.158 Conversation: realtimeEvent=AssistantText(chars=4)
+05-25 18:59:27.160 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=12)
+05-25 18:59:27.161 D/EnglishCarDiagnostics(30781): 18:59:27.160 Conversation: realtimeEvent=AssistantText(chars=12)
+05-25 18:59:27.296 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=8)
+05-25 18:59:27.296 D/EnglishCarDiagnostics(30781): 18:59:27.296 Conversation: realtimeEvent=AssistantText(chars=8)
+05-25 18:59:27.300 D/EnglishCarConversation(30781): realtimeEvent=AssistantText(chars=1)
+05-25 18:59:27.304 D/EnglishCarDiagnostics(30781): 18:59:27.303 Conversation: realtimeEvent=AssistantText(chars=1)
+05-25 18:59:27.315 D/EnglishCarDiagnostics(30781): 18:59:27.314 Realtime: barge-in armed avg=3802 peak=26675 candidateMs=300
+05-25 18:59:27.588 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_started
+05-25 18:59:27.588 D/EnglishCarDiagnostics(30781): 18:59:27.588 Realtime: server speech_started
+05-25 18:59:27.591 I/EnglishCarRealtime(30781): interruptAssistant
+05-25 18:59:27.592 D/EnglishCarDiagnostics(30781): 18:59:27.591 Realtime: interrupt assistant
+05-25 18:59:27.594 I/EnglishCarAudioTrack(30781): AudioTrack interrupt bytesWritten=226560
+05-25 18:59:27.595 D/EnglishCarDiagnostics(30781): 18:59:27.594 AudioTrack: interrupt bytesWritten=226560
+05-25 18:59:27.600 D/EnglishCarRealtime(30781): send event type=response.cancel
+05-25 18:59:27.601 D/EnglishCarConversation(30781): realtimeEvent=Interrupted
+05-25 18:59:27.601 D/EnglishCarDiagnostics(30781): 18:59:27.601 Conversation: realtimeEvent=Interrupted
+05-25 18:59:27.603 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:27.603 D/EnglishCarDiagnostics(30781): 18:59:27.603 Conversation: realtimeEvent=Listening
+05-25 18:59:27.608 D/EnglishCarRealtime(30781): server event type=response.output_audio.done
+05-25 18:59:27.608 D/EnglishCarDiagnostics(30781): 18:59:27.608 Realtime: server audio done bytesReceived=600000
+05-25 18:59:27.611 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:27.612 D/EnglishCarDiagnostics(30781): 18:59:27.612 Conversation: realtimeEvent=Listening
+05-25 18:59:27.616 D/EnglishCarRealtime(30781): server event type=response.output_audio_transcript.done
+05-25 18:59:27.616 D/EnglishCarRealtime(30781): server event type=response.content_part.done
+05-25 18:59:27.616 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:27.616 D/EnglishCarRealtime(30781): server event type=response.output_item.done
+05-25 18:59:27.616 D/EnglishCarRealtime(30781): server event type=response.done
+05-25 18:59:27.811 E/EnglishCarRealtime(30781): server event type=error code=response_cancel_not_active messageLength=45
+05-25 18:59:27.812 D/EnglishCarDiagnostics(30781): 18:59:27.811 Realtime: ignore server error type=invalid_request_error code=response_cancel_not_active eventId=null param=null message=Cancellation failed: no active response found
+05-25 18:59:27.815 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:27.815 D/EnglishCarDiagnostics(30781): 18:59:27.815 Conversation: realtimeEvent=Listening
+05-25 18:59:28.115 D/EnglishCarDiagnostics(30781): 18:59:28.114 Realtime: barge-in armed avg=1912 peak=6296 candidateMs=300
+05-25 18:59:28.317 D/EnglishCarDiagnostics(30781): 18:59:28.315 Realtime: drop likely assistant echo chunks=101 reason=assistant_echo avg=1720 peak=5446 speaking=false armed=false
+05-25 18:59:29.315 D/EnglishCarDiagnostics(30781): 18:59:29.314 Realtime: barge-in armed avg=3058 peak=8950 candidateMs=300
+05-25 18:59:30.035 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_stopped
+05-25 18:59:30.036 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.committed
+05-25 18:59:30.036 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:30.036 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:30.496 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:30.496 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:30.508 I/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.completed transcriptChars=6
+05-25 18:59:30.508 D/EnglishCarDiagnostics(30781): 18:59:30.508 Realtime: server transcription completed chars=6
+05-25 18:59:30.512 D/EnglishCarDiagnostics(30781): 18:59:30.511 Realtime: ignore transcript reason=too_short chars=6 words=1 echoWindow=false
+05-25 18:59:32.432 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_started
+05-25 18:59:32.433 D/EnglishCarDiagnostics(30781): 18:59:32.433 Realtime: server speech_started
+05-25 18:59:32.436 D/EnglishCarDiagnostics(30781): 18:59:32.436 Realtime: user speech started
+05-25 18:59:32.439 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:32.439 D/EnglishCarDiagnostics(30781): 18:59:32.439 Conversation: realtimeEvent=Listening
+05-25 18:59:32.905 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_stopped
+05-25 18:59:32.905 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.committed
+05-25 18:59:32.905 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:32.905 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:33.370 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:33.371 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:33.382 I/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.completed transcriptChars=5
+05-25 18:59:33.383 D/EnglishCarDiagnostics(30781): 18:59:33.382 Realtime: server transcription completed chars=5
+05-25 18:59:33.386 D/EnglishCarDiagnostics(30781): 18:59:33.385 Realtime: ignore transcript reason=too_short chars=5 words=1 echoWindow=false
+05-25 18:59:36.798 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_started
+05-25 18:59:36.799 D/EnglishCarDiagnostics(30781): 18:59:36.798 Realtime: server speech_started
+05-25 18:59:36.802 D/EnglishCarDiagnostics(30781): 18:59:36.801 Realtime: user speech started
+05-25 18:59:36.804 D/EnglishCarConversation(30781): realtimeEvent=Listening
+05-25 18:59:36.805 D/EnglishCarDiagnostics(30781): 18:59:36.804 Conversation: realtimeEvent=Listening
+05-25 18:59:37.297 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.speech_stopped
+05-25 18:59:37.298 D/EnglishCarRealtime(30781): server event type=input_audio_buffer.committed
+05-25 18:59:37.298 D/EnglishCarRealtime(30781): server event type=conversation.item.added
+05-25 18:59:37.298 D/EnglishCarRealtime(30781): server event type=conversation.item.done
+05-25 18:59:37.797 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:37.797 D/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.delta
+05-25 18:59:37.813 I/EnglishCarRealtime(30781): server event type=conversation.item.input_audio_transcription.completed transcriptChars=5
+05-25 18:59:37.814 D/EnglishCarDiagnostics(30781): 18:59:37.813 Realtime: server transcription completed chars=5
+05-25 18:59:37.817 D/EnglishCarDiagnostics(30781): 18:59:37.817 Realtime: ignore transcript reason=too_short chars=5 words=1 echoWindow=false
+05-25 18:59:38.379 D/EnglishCarRealtime(30781): microphone streaming heartbeat frames=500 bytesPerFrame=2400
+05-25 18:59:38.383 D/EnglishCarDiagnostics(30781): 18:59:38.382 Realtime: microphone heartbeat frames=500 bytesPerFrame=2400 avg=584 peak=2085 dropped=125
+05-25 18:59:40.188 D/EnglishCarConversation(30781): finishWithGoodbye closeApp=true
+05-25 18:59:40.189 D/EnglishCarDiagnostics(30781): 18:59:40.189 Conversation: finishWithGoodbye closeApp=true
+05-25 18:59:40.190 D/EnglishCarDiagnostics(30781): 18:59:40.190 Speech: stopListening
+05-25 18:59:40.191 I/EnglishCarRealtime(30781): stop sessionAgeMs=35477 audioFramesSent=536 audioBytesReceived=600000
+05-25 18:59:40.192 D/EnglishCarDiagnostics(30781): 18:59:40.192 Realtime: stop ageMs=35477 framesSent=536 audioBytesReceived=600000
+05-25 18:59:40.194 D/EnglishCarRealtime(30781): Realtime recording cancelled
+05-25 18:59:40.194 D/EnglishCarDiagnostics(30781): 18:59:40.194 Realtime: recording cancelled
+05-25 18:59:40.344 I/EnglishCarAudioTrack(30781): AudioTrack stop bytesWritten=226560
+05-25 18:59:40.345 D/EnglishCarDiagnostics(30781): 18:59:40.344 AudioTrack: stop bytesWritten=226560
+05-25 18:59:40.358 D/EnglishCarDiagnostics(30781): 18:59:40.357 WebRTC: stop
+05-25 18:59:40.362 D/EnglishCarDiagnostics(30781): 18:59:40.362 ServiceCtl: stop requested
+05-25 18:59:40.376 D/EnglishCarDiagnostics(30781): 18:59:40.376 TTS: speak assistant=emma chars=14
+05-25 18:59:40.377 D/EnglishCarDiagnostics(30781): 18:59:40.377 TTS: ensureReady await existing
+05-25 18:59:40.425 D/EnglishCarDiagnostics(30781): 18:59:40.425 TTS: voice selected name=en-us-x-sfg-local locale=en_US network=false quality=400 latency=200
+05-25 18:59:40.429 D/EnglishCarDiagnostics(30781): 18:59:40.429 TTS: utterance start id=cb82b74c chars=14
+05-25 18:59:40.431 D/EnglishCarDiagnostics(30781): 18:59:40.431 TTS: utterance enqueue id=cb82b74c result=0
+05-25 18:59:40.437 D/EnglishCarDiagnostics(30781): 18:59:40.437 Service: onDestroy
+05-25 18:59:41.556 D/EnglishCarDiagnostics(30781): 18:59:41.555 TTS: utterance speaking id=cb82b74c
+05-25 18:59:42.599 D/EnglishCarDiagnostics(30781): 18:59:42.598 TTS: utterance done id=cb82b74c
+05-25 18:59:42.606 D/EnglishCarConversation(30781): finish
+05-25 18:59:42.606 D/EnglishCarDiagnostics(30781): 18:59:42.606 Conversation: finish
+05-25 18:59:42.608 D/EnglishCarDiagnostics(30781): 18:59:42.608 AudioFocus: abandon start hasRequest=true
+05-25 18:59:42.612 D/EnglishCarDiagnostics(30781): 18:59:42.611 AudioFocus: abandon done
+05-25 18:59:42.614 D/EnglishCarDiagnostics(30781): 18:59:42.614 WebRTC: stop
+05-25 18:59:42.616 D/EnglishCarDiagnostics(30781): 18:59:42.616 Speech: stopListening
+05-25 18:59:42.618 D/EnglishCarDiagnostics(30781): 18:59:42.617 TTS: stop requested
+05-25 18:59:42.620 D/EnglishCarDiagnostics(30781): 18:59:42.620 ServiceCtl: stop requested
+05-25 18:59:42.623 D/EnglishCarDiagnostics(30781): 18:59:42.623 Activity: finishAndRemoveTask requested
+05-25 18:59:43.381 D/EnglishCarDiagnostics(30781): 18:59:43.380 Activity: onStop
+05-25 18:59:43.429 D/EnglishCarDiagnostics(30781): 18:59:43.428 Activity: onDestroy finishing=true changingConfig=false

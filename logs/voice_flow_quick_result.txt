@@ -1,0 +1,7 @@
+﻿Quick voice flow test 2026-05-25T20:07:33.2513557-05:00
+FAIL saludo creado (1->1) pattern=Realtime: response created startupGreeting=true
+FAIL saludo audio terminado (0->0) pattern=Realtime: server audio done bytesReceived=
+PLAY single_project.wav
+FAIL palabra unica aceptada (0->0) pattern=Realtime: accept transcript chars=.* words=1
+FAIL respuesta a palabra unica (0->0) pattern=Realtime: response created startupGreeting=false
+PLAY short_work.wav

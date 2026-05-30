@@ -1,8 +1,8 @@
 export type Env = {
-  OPENAI_API_KEY: string;
+  GEMINI_API_KEY: string;
   APP_API_TOKEN: string;
   ALLOWED_MODELS: string;
   DEFAULT_MODEL: string;
 };
 
-export type AiModel = "gpt-5.2" | "gpt-5-mini" | "gpt-5-nano" | "gpt-4o-mini";
+export type AiModel = "gemini-2.5-flash" | "gemini-2.5-flash-lite" | "gemini-2.0-flash" | "gemini-2.0-flash-lite";

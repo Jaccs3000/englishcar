@@ -32,16 +32,17 @@ import androidx.compose.ui.unit.dp
 private data class SetupAssistant(val id: String, val name: String, val voice: String)
 
 private val assistants = listOf(
-    SetupAssistant("emma", "Emma", "Female"),
-    SetupAssistant("sophia", "Sophia", "Female"),
-    SetupAssistant("alex", "Alex", "Male"),
-    SetupAssistant("james", "James", "Male")
+    SetupAssistant("female", "Isa", "Female"),
+    SetupAssistant("male", "Alex", "Male")
 )
 
 @Composable
-fun SetupScreen(onContinue: (String, String) -> Unit) {
+fun SetupScreen(
+    onContinue: (String, String) -> Unit,
+    onPreviewAssistant: (String, String, Boolean) -> Unit
+) {
     var userName by remember { mutableStateOf("") }
-    var assistantId by remember { mutableStateOf("emma") }
+    var assistantId by remember { mutableStateOf("female") }
 
     Column(
         modifier = Modifier
@@ -101,8 +102,11 @@ fun SetupScreen(onContinue: (String, String) -> Unit) {
             assistants.take(3).forEach { assistant ->
                 SetupAssistantChip(
                     selected = assistantId == assistant.id,
-                    text = "${assistant.name} (${assistant.voice})",
-                    onClick = { assistantId = assistant.id }
+                    text = assistant.name,
+                    onClick = {
+                        assistantId = assistant.id
+                        onPreviewAssistant(assistant.id, assistant.name, assistant.id == "male")
+                    }
                 )
             }
         }
@@ -111,8 +115,11 @@ fun SetupScreen(onContinue: (String, String) -> Unit) {
             assistants.drop(3).forEach { assistant ->
                 SetupAssistantChip(
                     selected = assistantId == assistant.id,
-                    text = "${assistant.name} (${assistant.voice})",
-                    onClick = { assistantId = assistant.id }
+                    text = assistant.name,
+                    onClick = {
+                        assistantId = assistant.id
+                        onPreviewAssistant(assistant.id, assistant.name, assistant.id == "male")
+                    }
                 )
             }
         }

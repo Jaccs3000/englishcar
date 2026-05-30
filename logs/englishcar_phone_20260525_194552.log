@@ -1,0 +1,21 @@
+--------- beginning of main
+05-25 19:47:18.870 D/EnglishCarDiagnostics(15623): 19:47:18.868 Activity: onCreate
+05-25 19:47:18.914 D/EnglishCarDiagnostics(15623): 19:47:18.913 Activity: onStart
+05-25 19:47:19.147 D/EnglishCarDiagnostics(15623): 19:47:19.146 TTS: warmUp requested
+05-25 19:47:19.157 D/EnglishCarDiagnostics(15623): 19:47:19.156 TTS: ensureReady init start
+05-25 19:47:19.944 D/EnglishCarDiagnostics(15623): 19:47:19.944 TTS: ensureReady init result status=0 ready=true
+05-25 19:48:18.578 D/EnglishCarDiagnostics(15623): 19:48:18.577 Activity: onStop
+05-25 19:48:19.109 D/EnglishCarDiagnostics(15623): 19:48:19.106 Activity: onStart
+05-25 19:48:34.447 W/System.err( 5818): android.os.DeadObjectException
+05-25 19:48:34.447 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 19:48:34.447 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 19:48:34.447 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.sendAppInstallUninstallEvent(Unknown Source:30)
+05-25 19:48:34.447 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.sendAppInstallUninstallEvent(Unknown Source:111)
+05-25 19:48:34.447 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.HMSetupHandler.handleMessage(Unknown Source:305)
+05-25 19:48:34.447 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 19:48:34.447 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 19:48:34.447 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 19:48:34.447 W/System.err( 5818): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 19:48:34.447 W/System.err( 5818): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 19:48:34.447 W/System.err( 5818): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 19:48:34.447 W/System.err( 5818): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)

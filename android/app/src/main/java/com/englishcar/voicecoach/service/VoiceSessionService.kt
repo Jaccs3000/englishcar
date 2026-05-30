@@ -12,12 +12,14 @@ import android.content.pm.ServiceInfo
 import android.media.AudioManager
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.app.ServiceCompat
 import com.englishcar.voicecoach.MainActivity
 import com.englishcar.voicecoach.conversation.ConversationState
 import com.englishcar.voicecoach.conversation.ConversationManager
+import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class VoiceSessionService : Service() {
     @Inject lateinit var conversationManager: ConversationManager
+    @Inject lateinit var diagnosticsLogger: DiagnosticsLogger
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private var noisyAudioReceiverRegistered = false
 
@@ -44,7 +47,10 @@ class VoiceSessionService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Log.i(TAG, "onCreate")
+        diagnosticsLogger.add("Service", "onCreate")
         ensureNotificationChannel()
+        startForegroundSession()
         registerNoisyAudioReceiver()
         scope.launch {
             conversationManager.uiState.collectLatest { state ->
@@ -56,6 +62,8 @@ class VoiceSessionService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "onStartCommand action=${intent?.action ?: "start"} state=${conversationManager.uiState.value.state}")
+        diagnosticsLogger.add("Service", "onStartCommand action=${intent?.action ?: "start"} state=${conversationManager.uiState.value.state}")
         when (intent?.action) {
             ACTION_PAUSE -> {
                 conversationManager.pause(spoken = true)
@@ -76,6 +84,8 @@ class VoiceSessionService : Service() {
     }
 
     override fun onDestroy() {
+        Log.i(TAG, "onDestroy")
+        diagnosticsLogger.add("Service", "onDestroy")
         scope.cancel()
         unregisterNoisyAudioReceiver()
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
@@ -85,6 +95,8 @@ class VoiceSessionService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun startForegroundSession() {
+        Log.d(TAG, "startForegroundSession state=${conversationManager.uiState.value.state}")
+        diagnosticsLogger.add("Service", "startForeground state=${conversationManager.uiState.value.state}")
         ServiceCompat.startForeground(
             this,
             NOTIFICATION_ID,
@@ -98,6 +110,7 @@ class VoiceSessionService : Service() {
     }
 
     private fun updateNotification(state: ConversationState) {
+        Log.v(TAG, "updateNotification state=$state")
         val manager = getSystemService(NotificationManager::class.java)
         manager.notify(NOTIFICATION_ID, buildNotification(state))
     }
@@ -156,6 +169,7 @@ class VoiceSessionService : Service() {
 
     private fun registerNoisyAudioReceiver() {
         if (noisyAudioReceiverRegistered) return
+        Log.d(TAG, "registerNoisyAudioReceiver")
         ContextCompat.registerReceiver(
             this,
             noisyAudioReceiver,
@@ -167,6 +181,7 @@ class VoiceSessionService : Service() {
 
     private fun unregisterNoisyAudioReceiver() {
         if (!noisyAudioReceiverRegistered) return
+        Log.d(TAG, "unregisterNoisyAudioReceiver")
         unregisterReceiver(noisyAudioReceiver)
         noisyAudioReceiverRegistered = false
     }
@@ -177,6 +192,7 @@ class VoiceSessionService : Service() {
             ConversationState.WaitingAI -> "English Car is thinking"
             ConversationState.Speaking -> "English Car is speaking"
             ConversationState.Paused -> "English Car is paused"
+            ConversationState.Interrupted -> "English Car was interrupted"
             ConversationState.Error -> "English Car needs attention"
             else -> "English Car is active"
         }
@@ -185,12 +201,14 @@ class VoiceSessionService : Service() {
     private fun notificationText(state: ConversationState): String {
         return when (state) {
             ConversationState.Paused -> "Tap Resume or return to the app."
+            ConversationState.Interrupted -> "Listening for your next phrase."
             ConversationState.Error -> "Open the app to retry."
             else -> "Conversation stays active while the phone is locked."
         }
     }
 
     private companion object {
+        const val TAG = "EnglishCarService"
         const val CHANNEL_ID = "active_conversation"
         const val NOTIFICATION_ID = 1001
         const val ACTION_PAUSE = "com.englishcar.voicecoach.action.PAUSE_SESSION"

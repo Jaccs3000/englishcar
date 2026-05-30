@@ -6,6 +6,7 @@ import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.net.URL
+import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +15,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 @Singleton
-class BackendConversationClient @Inject constructor() {
+class BackendConversationClient @Inject constructor(
+    private val diagnosticsLogger: DiagnosticsLogger
+) {
     suspend fun transcribe(
         backendUrl: String,
         appApiToken: String,
@@ -23,6 +26,7 @@ class BackendConversationClient @Inject constructor() {
         val baseUrl = backendUrl.trim().trimEnd('/')
         if (baseUrl.isBlank()) throw BackendException.BackendUnavailable
         if (appApiToken.isBlank()) throw BackendException.Unauthorized
+        diagnosticsLogger.add("Backend", "transcribe start host=${baseUrl.safeHost()} wavBytes=${wavAudio.size}")
 
         val boundary = "EnglishCar${System.currentTimeMillis()}"
         val connection = (URL("$baseUrl/v1/transcribe").openConnection() as HttpURLConnection).apply {
@@ -47,11 +51,15 @@ class BackendConversationClient @Inject constructor() {
             }
 
             if (responseCode !in 200..299) {
+                diagnosticsLogger.add("Backend", "transcribe failed code=$responseCode")
                 throw BackendException.fromHttp(responseCode, responseText)
             }
 
-            JSONObject(responseText).optString("text").trim()
+            JSONObject(responseText).optString("text").trim().also {
+                diagnosticsLogger.add("Backend", "transcribe success chars=${it.length}")
+            }
         } catch (error: Exception) {
+            diagnosticsLogger.add("Backend", "transcribe exception ${error.javaClass.simpleName}")
             throw BackendException.fromThrowable(error)
         } finally {
             connection.disconnect()
@@ -65,6 +73,7 @@ class BackendConversationClient @Inject constructor() {
         val baseUrl = backendUrl.trim().trimEnd('/')
         if (baseUrl.isBlank()) throw BackendException.BackendUnavailable
         if (appApiToken.isBlank()) throw BackendException.Unauthorized
+        diagnosticsLogger.add("Backend", "fetchModels start host=${baseUrl.safeHost()}")
 
         val connection = (URL("$baseUrl/v1/models").openConnection() as HttpURLConnection).apply {
             requestMethod = "GET"
@@ -83,11 +92,55 @@ class BackendConversationClient @Inject constructor() {
             }
 
             if (responseCode !in 200..299) {
+                diagnosticsLogger.add("Backend", "fetchModels failed code=$responseCode")
                 throw BackendException.fromHttp(responseCode, responseText)
             }
 
-            JSONObject(responseText).toAvailableModels()
+            JSONObject(responseText).toAvailableModels().also {
+                diagnosticsLogger.add("Backend", "fetchModels success count=${it.models.size} default=${it.defaultModel}")
+            }
         } catch (error: Exception) {
+            diagnosticsLogger.add("Backend", "fetchModels exception ${error.javaClass.simpleName}")
+            throw BackendException.fromThrowable(error)
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    suspend fun checkHealth(backendUrl: String): BackendHealth = withContext(Dispatchers.IO) {
+        val baseUrl = backendUrl.trim().trimEnd('/')
+        if (baseUrl.isBlank()) throw BackendException.BackendUnavailable
+        val startedAt = System.currentTimeMillis()
+        diagnosticsLogger.add("Backend", "health start host=${baseUrl.safeHost()}")
+
+        val connection = (URL("$baseUrl/health").openConnection() as HttpURLConnection).apply {
+            requestMethod = "GET"
+            connectTimeout = 10_000
+            readTimeout = 15_000
+            setRequestProperty("Accept", "application/json")
+        }
+
+        try {
+            val responseCode = connection.responseCode
+            val responseText = if (responseCode in 200..299) {
+                connection.inputStream.bufferedReader().use { it.readText() }
+            } else {
+                connection.errorStream?.bufferedReader()?.use { it.readText() }.orEmpty()
+            }
+
+            if (responseCode !in 200..299) {
+                diagnosticsLogger.add("Backend", "health failed code=$responseCode durationMs=${System.currentTimeMillis() - startedAt}")
+                throw BackendException.fromHttp(responseCode, responseText)
+            }
+
+            JSONObject(responseText).toBackendHealth().also {
+                diagnosticsLogger.add(
+                    "Backend",
+                    "health success version=${it.version} durationMs=${System.currentTimeMillis() - startedAt}"
+                )
+            }
+        } catch (error: Exception) {
+            diagnosticsLogger.add("Backend", "health exception ${error.javaClass.simpleName}")
             throw BackendException.fromThrowable(error)
         } finally {
             connection.disconnect()
@@ -102,6 +155,8 @@ class BackendConversationClient @Inject constructor() {
         val baseUrl = backendUrl.trim().trimEnd('/')
         if (baseUrl.isBlank()) error("Backend URL is not configured.")
         if (appApiToken.isBlank()) error("App API token is not configured.")
+        val startedAt = System.currentTimeMillis()
+        diagnosticsLogger.add("Backend", "conversation send start host=${baseUrl.safeHost()} type=${request.type} model=${request.model}")
 
         val connection = (URL("$baseUrl/v1/conversation/stream").openConnection() as HttpURLConnection).apply {
             requestMethod = "POST"
@@ -125,11 +180,18 @@ class BackendConversationClient @Inject constructor() {
             }
 
             if (responseCode !in 200..299) {
+                diagnosticsLogger.add("Backend", "conversation send failed code=$responseCode")
                 throw BackendException.fromHttp(responseCode, responseText)
             }
 
-            parseFinalEvent(responseText)
+            parseFinalEvent(responseText).also {
+                diagnosticsLogger.add(
+                    "Backend",
+                    "conversation final durationMs=${System.currentTimeMillis() - startedAt} replyChars=${it.spokenReply.length} saveFeedback=${it.shouldSaveFeedback}"
+                )
+            }
         } catch (error: Exception) {
+            diagnosticsLogger.add("Backend", "conversation exception ${error.javaClass.simpleName} durationMs=${System.currentTimeMillis() - startedAt}")
             throw BackendException.fromThrowable(error)
         } finally {
             connection.disconnect()
@@ -147,7 +209,10 @@ class BackendConversationClient @Inject constructor() {
             dataLines.clear()
             return when {
                 event == "final" && data.isNotBlank() -> JSONObject(data).toAiFinalResponse()
-                event == "error" && data.isNotBlank() -> throw BackendException.BackendUnavailable
+                event == "error" && data.isNotBlank() -> {
+                    diagnosticsLogger.add("Backend", "conversation error event detail=${data.safeBackendErrorDetail()}")
+                    throw BackendException.BackendUnavailable
+                }
                 else -> null
             }
         }
@@ -184,7 +249,6 @@ class BackendConversationClient @Inject constructor() {
             .put("assistantPersonality", assistantPersonality)
             .put("userName", userName)
             .put("model", model)
-            .put("feedbackLevel", feedbackLevel)
             .put("locale", locale)
             .put("recentContext", context)
     }
@@ -213,6 +277,13 @@ class BackendConversationClient @Inject constructor() {
         )
     }
 
+    private fun JSONObject.toBackendHealth(): BackendHealth {
+        return BackendHealth(
+            ok = optBoolean("ok", false),
+            version = optString("version").ifBlank { "unknown" }
+        )
+    }
+
     private fun JSONObject.optNullableString(name: String): String? {
         if (!has(name) || isNull(name)) return null
         return optString(name).takeIf { it.isNotBlank() }
@@ -227,7 +298,29 @@ class BackendConversationClient @Inject constructor() {
         writeText("\r\n--$boundary--\r\n")
         flush()
     }
+
+    private fun String.safeHost(): String {
+        return runCatching { URL(this).host }.getOrDefault("unknown")
+    }
+
+    private fun String.safeBackendErrorDetail(): String {
+        if (isBlank()) return "empty"
+        return runCatching {
+            val json = JSONObject(this)
+            listOfNotNull(
+                json.optString("code").takeIf { it.isNotBlank() }?.let { "code=$it" },
+                json.optString("status").takeIf { it.isNotBlank() }?.let { "status=$it" },
+                json.optString("details").takeIf { it.isNotBlank() }?.let { "details=${it.take(160)}" }
+            ).joinToString(" ").ifBlank { "json_error" }
+        }.getOrDefault(take(160).replace(Regex("\\s+"), " "))
+    }
+
 }
+
+data class BackendHealth(
+    val ok: Boolean,
+    val version: String
+)
 
 sealed class BackendException(message: String) : IOException(message) {
     data object InternetUnavailable : BackendException("Internet connection lost.")

@@ -8,10 +8,8 @@ data class AssistantProfile(
 
 object AssistantCatalog {
     private val assistants = listOf(
-        AssistantProfile("emma", "Emma", "Young and upbeat"),
-        AssistantProfile("sophia", "Sophia", "Mature and warm"),
-        AssistantProfile("alex", "Alex", "Young and casual"),
-        AssistantProfile("james", "James", "Mature and calm")
+        AssistantProfile("female", "Isa", "Female voice: clear, neutral, paused, didactic American English"),
+        AssistantProfile("male", "Alex", "Male voice: clear, neutral, paused, didactic American English")
     )
 
     fun find(id: String): AssistantProfile {

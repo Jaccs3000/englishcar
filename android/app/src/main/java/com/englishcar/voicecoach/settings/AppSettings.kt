@@ -7,27 +7,19 @@ data class CommandSettings(
     val closeApp: String = "close app"
 )
 
-enum class FeedbackLevel {
-    Low,
-    Medium,
-    High
-}
-
 data class AppSettings(
     val isFirstLaunchComplete: Boolean = false,
     val userName: String = "",
-    val activeAssistantId: String = "emma",
+    val activeAssistantId: String = "female",
     val assistantNames: Map<String, String> = mapOf(
-        "emma" to "Emma",
-        "sophia" to "Sophia",
-        "alex" to "Alex",
-        "james" to "James"
+        "female" to "Isa",
+        "male" to "Alex"
     ),
     val backendUrl: String = "",
     val appApiToken: String = "",
-    val model: String = "gpt-5-mini",
-    val silenceTimeoutMs: Int = 3500,
+    val model: String = "gemini-2.5-flash-lite",
+    val silenceTimeoutMs: Int = 2400,
     val autoPauseTimeoutMs: Int = 60_000,
-    val commands: CommandSettings = CommandSettings(),
-    val feedbackLevel: FeedbackLevel = FeedbackLevel.Medium
+    val autoFinishTimeoutMs: Int = 600_000,
+    val commands: CommandSettings = CommandSettings()
 )

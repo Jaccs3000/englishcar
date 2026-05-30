@@ -28,94 +28,91 @@ class SettingsRepository @Inject constructor(
         val Model = stringPreferencesKey("model")
         val SilenceTimeoutMs = intPreferencesKey("silence_timeout_ms")
         val AutoPauseTimeoutMs = intPreferencesKey("auto_pause_timeout_ms")
-        val FeedbackLevel = stringPreferencesKey("feedback_level")
+        val AutoFinishTimeoutMs = intPreferencesKey("auto_finish_timeout_ms")
         val PauseCommand = stringPreferencesKey("command_pause")
         val ResumeCommand = stringPreferencesKey("command_resume")
         val FinishCommand = stringPreferencesKey("command_finish")
         val CloseAppCommand = stringPreferencesKey("command_close_app")
-        val EmmaName = stringPreferencesKey("assistant_name_emma")
-        val SophiaName = stringPreferencesKey("assistant_name_sophia")
-        val OliviaName = stringPreferencesKey("assistant_name_olivia")
-        val AlexName = stringPreferencesKey("assistant_name_alex")
-        val JamesName = stringPreferencesKey("assistant_name_james")
+        val FemaleName = stringPreferencesKey("assistant_name_female")
+        val MaleName = stringPreferencesKey("assistant_name_male")
     }
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { prefs ->
         AppSettings(
             isFirstLaunchComplete = prefs[Keys.FirstLaunchComplete] ?: false,
             userName = prefs[Keys.UserName].orEmpty(),
-            activeAssistantId = prefs[Keys.ActiveAssistantId] ?: "emma",
+            activeAssistantId = normalizeAssistantId(prefs[Keys.ActiveAssistantId]),
             assistantNames = mapOf(
-                "emma" to (prefs[Keys.EmmaName] ?: "Emma"),
-                "sophia" to (prefs[Keys.SophiaName] ?: "Sophia"),
-                "olivia" to (prefs[Keys.OliviaName] ?: "Olivia"),
-                "alex" to (prefs[Keys.AlexName] ?: "Alex"),
-                "james" to (prefs[Keys.JamesName] ?: "James")
+                "female" to "Isa",
+                "male" to "Alex"
             ),
             backendUrl = prefs[Keys.BackendUrl].orEmpty(),
             appApiToken = prefs[Keys.AppApiToken].orEmpty(),
-            model = prefs[Keys.Model] ?: "gpt-5-mini",
-            silenceTimeoutMs = prefs[Keys.SilenceTimeoutMs] ?: 3500,
+            model = normalizeModel(prefs[Keys.Model]),
+            silenceTimeoutMs = (prefs[Keys.SilenceTimeoutMs] ?: 2400).coerceIn(900, 8000),
             autoPauseTimeoutMs = prefs[Keys.AutoPauseTimeoutMs] ?: 60_000,
+            autoFinishTimeoutMs = prefs[Keys.AutoFinishTimeoutMs] ?: 600_000,
             commands = CommandSettings(
                 pause = prefs[Keys.PauseCommand] ?: "hold on",
                 resume = prefs[Keys.ResumeCommand] ?: "let's continue",
                 finish = prefs[Keys.FinishCommand] ?: "finish",
                 closeApp = prefs[Keys.CloseAppCommand] ?: "close app"
-            ),
-            feedbackLevel = parseFeedbackLevel(prefs[Keys.FeedbackLevel])
+            )
         )
     }
 
     suspend fun completeFirstLaunch(userName: String, assistantId: String) {
         context.dataStore.edit { prefs ->
             prefs[Keys.FirstLaunchComplete] = true
-            prefs[Keys.UserName] = userName.trim()
-            prefs[Keys.ActiveAssistantId] = assistantId
+            prefs[Keys.UserName] = userName.toDisplayName()
+            prefs[Keys.ActiveAssistantId] = normalizeAssistantId(assistantId)
         }
     }
 
     suspend fun saveUserName(userName: String) {
         context.dataStore.edit { prefs ->
-            prefs[Keys.UserName] = userName.trim()
+            prefs[Keys.UserName] = userName.toDisplayName()
         }
     }
 
     suspend fun saveActiveAssistant(assistantId: String) {
         context.dataStore.edit { prefs ->
-            prefs[Keys.ActiveAssistantId] = assistantId
+            prefs[Keys.ActiveAssistantId] = normalizeAssistantId(assistantId)
         }
     }
 
     suspend fun saveAssistantName(assistantId: String, name: String) {
         context.dataStore.edit { prefs ->
             val key = when (assistantId) {
-                "emma" -> Keys.EmmaName
-                "sophia" -> Keys.SophiaName
-                "olivia" -> Keys.OliviaName
-                "alex" -> Keys.AlexName
-                "james" -> Keys.JamesName
+                "female" -> Keys.FemaleName
+                "male" -> Keys.MaleName
                 else -> return@edit
             }
-            prefs[key] = name.trim().ifBlank { defaultAssistantName(assistantId) }
+            prefs[key] = defaultAssistantName(assistantId)
         }
     }
 
     suspend fun saveModel(model: String) {
         context.dataStore.edit { prefs ->
-            prefs[Keys.Model] = model
+            prefs[Keys.Model] = normalizeModel(model)
         }
     }
 
     suspend fun saveSilenceTimeout(timeoutMs: Int) {
         context.dataStore.edit { prefs ->
-            prefs[Keys.SilenceTimeoutMs] = timeoutMs
+            prefs[Keys.SilenceTimeoutMs] = timeoutMs.coerceIn(900, 8000)
         }
     }
 
     suspend fun saveAutoPauseTimeout(timeoutMs: Int) {
         context.dataStore.edit { prefs ->
             prefs[Keys.AutoPauseTimeoutMs] = timeoutMs
+        }
+    }
+
+    suspend fun saveAutoFinishTimeout(timeoutMs: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.AutoFinishTimeoutMs] = timeoutMs
         }
     }
 
@@ -135,22 +132,29 @@ class SettingsRepository @Inject constructor(
         }
     }
 
-    suspend fun saveFeedbackLevel(level: FeedbackLevel) {
-        context.dataStore.edit { prefs ->
-            prefs[Keys.FeedbackLevel] = level.name.lowercase()
-        }
-    }
-
     suspend fun currentSettings(): AppSettings = settings.first()
 
     private fun defaultAssistantName(assistantId: String): String {
         return when (assistantId) {
-            "emma" -> "Emma"
-            "sophia" -> "Sophia"
-            "olivia" -> "Olivia"
-            "alex" -> "Alex"
-            "james" -> "James"
-            else -> "Emma"
+            "male" -> "Alex"
+            else -> "Isa"
+        }
+    }
+
+    private fun normalizeAssistantId(value: String?): String {
+        return when (value) {
+            "male", "alex", "james" -> "male"
+            else -> "female"
+        }
+    }
+
+    private fun normalizeModel(value: String?): String {
+        return when (value) {
+            "gemini-2.5-flash",
+            "gemini-2.5-flash-lite",
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite" -> value
+            else -> "gemini-2.5-flash-lite"
         }
     }
 
@@ -158,11 +162,12 @@ class SettingsRepository @Inject constructor(
         return value.trim().replace(Regex("\\s+"), " ").ifBlank { fallback }
     }
 
-    private fun parseFeedbackLevel(value: String?): FeedbackLevel {
-        return when (value?.lowercase()) {
-            "low" -> FeedbackLevel.Low
-            "high" -> FeedbackLevel.High
-            else -> FeedbackLevel.Medium
-        }
+    private fun String.toDisplayName(): String {
+        return trim()
+            .lowercase()
+            .split(Regex("\\s+"))
+            .filter { it.isNotBlank() }
+            .joinToString(" ") { word -> word.replaceFirstChar { it.titlecase() } }
     }
+
 }

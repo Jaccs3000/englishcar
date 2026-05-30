@@ -1,0 +1,150 @@
+--------- beginning of main
+05-25 18:55:14.970 D/EnglishCarDiagnostics(29861): 18:55:14.968 Activity: onCreate
+05-25 18:55:15.005 D/EnglishCarDiagnostics(29861): 18:55:15.004 Activity: onStart
+05-25 18:55:15.201 D/EnglishCarDiagnostics(29861): 18:55:15.201 TTS: warmUp requested
+05-25 18:55:15.202 D/EnglishCarDiagnostics(29861): 18:55:15.202 TTS: ensureReady init start
+05-25 18:55:16.614 D/EnglishCarDiagnostics(29861): 18:55:16.614 TTS: ensureReady init result status=0 ready=true
+05-25 18:55:16.625 D/EnglishCarDiagnostics(29861): 18:55:16.624 Activity: onStop
+05-25 18:56:09.915 D/EnglishCarDiagnostics(29861): 18:56:09.914 Activity: onStart
+05-25 18:56:40.388 D/EnglishCarDiagnostics(29861): 18:56:40.387 Backend: fetchModels start host=english-car-backend.jaccs3000.workers.dev
+05-25 18:56:40.801 D/EnglishCarDiagnostics(29861): 18:56:40.801 Backend: fetchModels success count=3 default=gpt-5-mini
+05-25 18:56:44.485 D/EnglishCarDiagnostics(29861): 18:56:44.485 MainVM: startConversation permission=true
+05-25 18:56:44.487 D/EnglishCarDiagnostics(29861): 18:56:44.487 MainVM: start service before conversation
+05-25 18:56:44.492 D/EnglishCarDiagnostics(29861): 18:56:44.490 ServiceCtl: start requested
+05-25 18:56:44.499 D/EnglishCarDiagnostics(29861): 18:56:44.499 ServiceCtl: start dispatched
+05-25 18:56:44.502 D/EnglishCarDiagnostics(29861): 18:56:44.501 MainVM: call conversationManager.start
+05-25 18:56:44.503 D/EnglishCarConversation(29861): start permission=true
+05-25 18:56:44.503 D/EnglishCarDiagnostics(29861): 18:56:44.503 Conversation: start permission=true
+05-25 18:56:44.505 D/EnglishCarDiagnostics(29861): 18:56:44.505 AudioFocus: request start sdk=35
+05-25 18:56:44.512 D/EnglishCarDiagnostics(29861): 18:56:44.511 AudioFocus: request result=1 granted=true
+05-25 18:56:44.521 D/EnglishCarDiagnostics(29861): 18:56:44.521 Service: onCreate
+05-25 18:56:44.524 D/EnglishCarDiagnostics(29861): 18:56:44.524 Service: startForeground state=Idle
+05-25 18:56:44.538 D/EnglishCarDiagnostics(29861): 18:56:44.538 Service: onStartCommand action=start state=Idle
+05-25 18:56:44.540 D/EnglishCarDiagnostics(29861): 18:56:44.539 Service: startForeground state=Idle
+05-25 18:56:44.558 I/EnglishCarConversation(29861): start mode=RealtimeExperimental assistant=emma
+05-25 18:56:44.559 D/EnglishCarDiagnostics(29861): 18:56:44.558 Conversation: start mode=RealtimeExperimental assistant=emma
+05-25 18:56:44.560 I/EnglishCarConversation(29861): startRealtime assistant=emma
+05-25 18:56:44.560 D/EnglishCarDiagnostics(29861): 18:56:44.560 Conversation: startRealtime assistant=emma
+05-25 18:56:44.562 D/EnglishCarDiagnostics(29861): 18:56:44.561 Conversation: startRealtimeTransport transport=WebRtc
+05-25 18:56:44.564 D/EnglishCarDiagnostics(29861): 18:56:44.564 WebRTC: start assistant=emma
+05-25 18:56:44.566 D/EnglishCarDiagnostics(29861): 18:56:44.566 WebRTC: stop
+05-25 18:56:44.600 E/EnglishCarConversation(29861): Unhandled conversation coroutine error
+05-25 18:56:44.600 E/EnglishCarConversation(29861): java.lang.NoClassDefFoundError: Failed resolution of: Lorg/webrtc/Environment;
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(PeerConnectionFactory.java:166)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(Unknown Source:0)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at org.webrtc.PeerConnectionFactory.builder(PeerConnectionFactory.java:295)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.buildPeerConnection(RealtimeWebRtcVoiceClient.kt:153)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.start(RealtimeWebRtcVoiceClient.kt:78)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtimeTransport(ConversationManager.kt:242)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtime(ConversationManager.kt:213)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager.access$startRealtime(ConversationManager.kt:42)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager$start$3.invokeSuspend(ConversationManager.kt:143)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith(DispatchedContinuation.kt:367)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith$default(DispatchedContinuation.kt:278)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.internal.ScopeCoroutine.afterCompletion(Scopes.kt:27)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.continueCompleting(JobSupport.kt:940)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.access$continueCompleting(JobSupport.kt:25)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport$ChildCompletion.invoke(JobSupport.kt:1159)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.notifyCompletion(JobSupport.kt:1497)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.completeStateFinalization(JobSupport.kt:325)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.finalizeFinishingState(JobSupport.kt:242)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.tryMakeCompletingSlowPath(JobSupport.kt:910)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.tryMakeCompleting(JobSupport.kt:867)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.makeCompletingOnce$kotlinx_coroutines_core(JobSupport.kt:832)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:108)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at android.os.Handler.handleCallback(Handler.java:1001)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at android.os.Handler.dispatchMessage(Handler.java:105)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at android.os.Looper.loop(Looper.java:384)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): Caused by: java.lang.ClassNotFoundException: Didn't find class "org.webrtc.Environment" on path: DexPathList[[zip file "/data/app/~~vPsdM7ddUCPskEZBazeKFQ==/com.englishcar.voicecoach-oD-M0KbNpUdYbB1ODuS_nA==/base.apk"],nativeLibraryDirectories=[/data/app/~~vPsdM7ddUCPskEZBazeKFQ==/com.englishcar.voicecoach-oD-M0KbNpUdYbB1ODuS_nA==/lib/arm64, /data/app/~~vPsdM7ddUCPskEZBazeKFQ==/com.englishcar.voicecoach-oD-M0KbNpUdYbB1ODuS_nA==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:642)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:578)
+05-25 18:56:44.600 E/EnglishCarConversation(29861): 	... 33 more
+05-25 18:56:44.600 D/EnglishCarDiagnostics(29861): 18:56:44.600 Conversation: unhandled coroutine NoClassDefFoundError message=Failed resolution of: Lorg/webrtc/Environment;
+05-25 18:56:49.798 D/EnglishCarDiagnostics(29861): 18:56:49.798 ServiceCtl: start requested
+05-25 18:56:49.801 D/EnglishCarDiagnostics(29861): 18:56:49.801 ServiceCtl: start dispatched
+05-25 18:56:49.803 D/EnglishCarConversation(29861): finish
+05-25 18:56:49.803 D/EnglishCarDiagnostics(29861): 18:56:49.803 Conversation: finish
+05-25 18:56:49.805 D/EnglishCarDiagnostics(29861): 18:56:49.805 AudioFocus: abandon start hasRequest=true
+05-25 18:56:49.808 D/EnglishCarDiagnostics(29861): 18:56:49.808 AudioFocus: abandon done
+05-25 18:56:49.810 D/EnglishCarDiagnostics(29861): 18:56:49.810 WebRTC: stop
+05-25 18:56:49.811 D/EnglishCarDiagnostics(29861): 18:56:49.811 Speech: stopListening
+05-25 18:56:49.813 D/EnglishCarDiagnostics(29861): 18:56:49.812 TTS: stop requested
+05-25 18:56:49.815 D/EnglishCarDiagnostics(29861): 18:56:49.814 ServiceCtl: stop requested
+05-25 18:56:49.818 D/EnglishCarConversation(29861): start permission=true
+05-25 18:56:49.818 D/EnglishCarDiagnostics(29861): 18:56:49.818 Conversation: start permission=true
+05-25 18:56:49.820 D/EnglishCarDiagnostics(29861): 18:56:49.820 AudioFocus: request start sdk=35
+05-25 18:56:49.823 D/EnglishCarDiagnostics(29861): 18:56:49.823 AudioFocus: request result=1 granted=true
+05-25 18:56:49.827 D/EnglishCarDiagnostics(29861): 18:56:49.827 Service: onStartCommand action=start state=Idle
+05-25 18:56:49.829 D/EnglishCarDiagnostics(29861): 18:56:49.829 Service: startForeground state=Idle
+05-25 18:56:49.851 D/EnglishCarDiagnostics(29861): 18:56:49.851 Service: onDestroy
+05-25 18:56:49.858 I/EnglishCarConversation(29861): start mode=RealtimeExperimental assistant=emma
+05-25 18:56:49.858 D/EnglishCarDiagnostics(29861): 18:56:49.858 Conversation: start mode=RealtimeExperimental assistant=emma
+05-25 18:56:49.859 I/EnglishCarConversation(29861): startRealtime assistant=emma
+05-25 18:56:49.860 D/EnglishCarDiagnostics(29861): 18:56:49.860 Conversation: startRealtime assistant=emma
+05-25 18:56:49.862 D/EnglishCarDiagnostics(29861): 18:56:49.862 Conversation: startRealtimeTransport transport=WebRtc
+05-25 18:56:49.864 D/EnglishCarDiagnostics(29861): 18:56:49.863 WebRTC: start assistant=emma
+05-25 18:56:49.865 D/EnglishCarDiagnostics(29861): 18:56:49.865 WebRTC: stop
+05-25 18:56:49.868 E/EnglishCarConversation(29861): Unhandled conversation coroutine error
+05-25 18:56:49.868 E/EnglishCarConversation(29861): java.lang.NoClassDefFoundError: Failed resolution of: Lorg/webrtc/Environment;
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(PeerConnectionFactory.java:166)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at org.webrtc.PeerConnectionFactory$Builder.<init>(Unknown Source:0)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at org.webrtc.PeerConnectionFactory.builder(PeerConnectionFactory.java:295)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.buildPeerConnection(RealtimeWebRtcVoiceClient.kt:153)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.ai.RealtimeWebRtcVoiceClient.start(RealtimeWebRtcVoiceClient.kt:78)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtimeTransport(ConversationManager.kt:242)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager.startRealtime(ConversationManager.kt:213)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager.access$startRealtime(ConversationManager.kt:42)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.englishcar.voicecoach.conversation.ConversationManager$start$3.invokeSuspend(ConversationManager.kt:143)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith(DispatchedContinuation.kt:367)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.internal.DispatchedContinuationKt.resumeCancellableWith$default(DispatchedContinuation.kt:278)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.internal.ScopeCoroutine.afterCompletion(Scopes.kt:27)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.continueCompleting(JobSupport.kt:940)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.access$continueCompleting(JobSupport.kt:25)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport$ChildCompletion.invoke(JobSupport.kt:1159)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.notifyCompletion(JobSupport.kt:1497)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.completeStateFinalization(JobSupport.kt:325)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.finalizeFinishingState(JobSupport.kt:242)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.tryMakeCompletingSlowPath(JobSupport.kt:910)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.tryMakeCompleting(JobSupport.kt:867)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.JobSupport.makeCompletingOnce$kotlinx_coroutines_core(JobSupport.kt:832)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:100)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:108)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at android.os.Handler.handleCallback(Handler.java:1001)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at android.os.Handler.dispatchMessage(Handler.java:105)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at android.os.Looper.loop(Looper.java:384)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at android.app.ActivityThread.main(ActivityThread.java:8936)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at java.lang.reflect.Method.invoke(Native Method)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:580)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:907)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): Caused by: java.lang.ClassNotFoundException: Didn't find class "org.webrtc.Environment" on path: DexPathList[[zip file "/data/app/~~vPsdM7ddUCPskEZBazeKFQ==/com.englishcar.voicecoach-oD-M0KbNpUdYbB1ODuS_nA==/base.apk"],nativeLibraryDirectories=[/data/app/~~vPsdM7ddUCPskEZBazeKFQ==/com.englishcar.voicecoach-oD-M0KbNpUdYbB1ODuS_nA==/lib/arm64, /data/app/~~vPsdM7ddUCPskEZBazeKFQ==/com.englishcar.voicecoach-oD-M0KbNpUdYbB1ODuS_nA==/base.apk!/lib/arm64-v8a, /system/lib64, /system_ext/lib64]]
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at dalvik.system.BaseDexClassLoader.findClass(BaseDexClassLoader.java:259)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:642)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	at java.lang.ClassLoader.loadClass(ClassLoader.java:578)
+05-25 18:56:49.868 E/EnglishCarConversation(29861): 	... 33 more
+05-25 18:56:49.869 D/EnglishCarDiagnostics(29861): 18:56:49.869 Conversation: unhandled coroutine NoClassDefFoundError message=Failed resolution of: Lorg/webrtc/Environment;
+05-25 18:57:30.833 W/System.err( 5818): android.os.DeadObjectException
+05-25 18:57:30.834 W/System.err( 5818): 	at android.os.BinderProxy.transactNative(Native Method)
+05-25 18:57:30.834 W/System.err( 5818): 	at android.os.BinderProxy.transact(BinderProxy.java:588)
+05-25 18:57:30.834 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.aidl.IHostManagerListener$Stub$Proxy.onWearableStatusInfo(Unknown Source:21)
+05-25 18:57:30.834 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.onWearableStatusInfo(Unknown Source:98)
+05-25 18:57:30.834 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.service.IUHostManager.onBatteryStatusReceived(Unknown Source:116)
+05-25 18:57:30.834 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.setting.receiver.PacketParser.parseData(Unknown Source:2497)
+05-25 18:57:30.834 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.setting.receiver.PacketParser.a(Unknown Source:0)
+05-25 18:57:30.834 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.setting.receiver.PacketParser$1.handleMessage(Unknown Source:41)
+05-25 18:57:30.834 W/System.err( 5818): 	at android.os.Handler.dispatchMessage(Handler.java:112)
+05-25 18:57:30.834 W/System.err( 5818): 	at android.os.Looper.loopOnce(Looper.java:268)
+05-25 18:57:30.834 W/System.err( 5818): 	at android.os.Looper.loop(Looper.java:384)
+05-25 18:57:30.834 W/System.err( 5818): 	at com.samsung.wearable.hostmanager.setting.receiver.PacketParser.run(Unknown Source:10)
+05-25 18:57:50.503 D/EnglishCarDiagnostics(29861): 18:57:50.503 Activity: onStop

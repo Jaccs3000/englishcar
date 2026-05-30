@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect x="20" y="20" width="984" height="984" rx="140" fill="#ffffff"/>
+  <path d="M20,180 Q20,20 180,20 L520,20" fill="none" stroke="#f5c400" stroke-width="24"/>
+  <path d="M520,20 L844,20 Q1004,20 1004,180" fill="none" stroke="#0b57d0" stroke-width="24"/>
+  <path d="M20,844 Q20,1004 180,1004 L844,1004 Q1004,1004 1004,844" fill="none" stroke="#e51d2a" stroke-width="24"/>
+
+  <g transform="translate(170,260)">
+    <path d="M0 60 C0 20 30 0 70 0 H260 V230 H70 C30 230 0 210 0 170 Z" fill="#0b57d0" rx="40"/>
+    <polygon points="70,230 40,290 110,240" fill="#0b57d0"/>
+    <circle cx="70" cy="115" r="14" fill="white"/>
+    <circle cx="120" cy="115" r="14" fill="white"/>
+    <circle cx="170" cy="115" r="14" fill="white"/>
+  </g>
+
+  <g transform="translate(594,290)">
+    <path d="M0 0 H170 C210 0 240 30 240 70 V170 C240 210 210 240 170 240 H0 Z" fill="#f5c400"/>
+    <polygon points="180,240 240,290 220,220" fill="#f5c400"/>
+    <rect x="70" y="80" width="16" height="80" rx="8" fill="white"/>
+    <rect x="105" y="60" width="16" height="120" rx="8" fill="white"/>
+    <rect x="140" y="80" width="16" height="80" rx="8" fill="white"/>
+  </g>
+
+  <g transform="translate(420,250)">
+    <rect x="20" y="60" width="120" height="260" rx="60" fill="#e51d2a"/>
+    <line x1="50" y1="110" x2="20" y2="110" stroke="white" stroke-width="12"/>
+    <line x1="50" y1="150" x2="20" y2="150" stroke="white" stroke-width="12"/>
+    <line x1="50" y1="190" x2="20" y2="190" stroke="white" stroke-width="12"/>
+    <line x1="110" y1="110" x2="140" y2="110" stroke="white" stroke-width="12"/>
+    <line x1="110" y1="150" x2="140" y2="150" stroke="white" stroke-width="12"/>
+    <line x1="110" y1="190" x2="140" y2="190" stroke="white" stroke-width="12"/>
+    <path d="M0 250 A80 80 0 0 0 160 250" fill="none" stroke="#0a3d9a" stroke-width="16"/>
+    <line x1="80" y1="320" x2="80" y2="390" stroke="#0a3d9a" stroke-width="16"/>
+    <line x1="20" y1="390" x2="140" y2="390" stroke="#0a3d9a" stroke-width="16"/>
+  </g>
+
+  <g transform="translate(400,140)">
+    <polygon points="0,40 140,0 280,40 140,100" fill="#0a3d9a"/>
+    <rect x="105" y="40" width="70" height="40" fill="#0a3d9a"/>
+    <line x1="220" y1="40" x2="220" y2="130" stroke="#f5c400" stroke-width="8"/>
+    <circle cx="220" cy="40" r="10" fill="#f5c400"/>
+    <polygon points="210,130 230,130 220,165" fill="#f5c400"/>
+  </g>
+
+  <text x="512" y="800" text-anchor="middle" font-size="90" font-family="Arial, sans-serif" font-weight="700">
+    <tspan fill="#0b57d0">Chat</tspan><tspan fill="#e51d2a">Voice</tspan>
+  </text>
+  <text x="512" y="880" text-anchor="middle" font-size="34" letter-spacing="8" font-family="Arial, sans-serif" fill="#0b57d0">
+    LEARN • SPEAK • GROW
+  </text>
+</svg>
