@@ -189,6 +189,7 @@ class VoiceSessionService : Service() {
     private fun notificationTitle(state: ConversationState): String {
         return when (state) {
             ConversationState.Listening -> "English Car is listening"
+            ConversationState.AwaitingUser -> "English Car is ready"
             ConversationState.WaitingAI -> "English Car is thinking"
             ConversationState.Speaking -> "English Car is speaking"
             ConversationState.Paused -> "English Car is paused"
@@ -201,6 +202,7 @@ class VoiceSessionService : Service() {
     private fun notificationText(state: ConversationState): String {
         return when (state) {
             ConversationState.Paused -> "Tap Resume or return to the app."
+            ConversationState.AwaitingUser -> "Tap Resume when you want to speak."
             ConversationState.Interrupted -> "Listening for your next phrase."
             ConversationState.Error -> "Open the app to retry."
             else -> "Conversation stays active while the phone is locked."

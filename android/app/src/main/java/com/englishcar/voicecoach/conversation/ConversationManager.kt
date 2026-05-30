@@ -55,8 +55,6 @@ class ConversationManager @Inject constructor(
     private companion object {
         const val TAG = "EnglishCarConversation"
         const val MAX_PAUSED_COMMAND_ATTEMPTS = 1
-        const val QUIET_NO_MATCH_THRESHOLD = 5
-        const val QUIET_RETRY_DELAY_MS = 15_000L
     }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, error ->
@@ -419,16 +417,9 @@ class ConversationManager @Inject constructor(
         if (code == SpeechRecognitionClient.ERROR_NO_MATCH) {
             scope.launch {
                 consecutiveNoMatchCount += 1
-                val delayMs = when {
-                    consecutiveNoMatchCount >= QUIET_NO_MATCH_THRESHOLD -> QUIET_RETRY_DELAY_MS
-                    consecutiveNoMatchCount >= 6 -> 4_000L
-                    consecutiveNoMatchCount >= 3 -> 2_500L
-                    else -> 900L
-                }
-                diagnosticsLogger.add("Conversation", "no match count=$consecutiveNoMatchCount retryDelayMs=$delayMs")
-                _uiState.update { it.copy(state = ConversationState.Listening, lastUserText = "", errorMessage = null) }
-                delay(delayMs)
-                if (isSessionActive) listen(resetInactivityTimer = false)
+                diagnosticsLogger.add("Conversation", "no match count=$consecutiveNoMatchCount; awaiting user tap")
+                speechRecognitionClient.stopListening()
+                _uiState.update { it.copy(state = ConversationState.AwaitingUser, lastUserText = "", errorMessage = null) }
             }
             return
         }

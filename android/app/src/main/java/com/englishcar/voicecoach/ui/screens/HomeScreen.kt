@@ -149,15 +149,25 @@ fun HomeScreen(
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center
             )
-            if (conversationUiState.state == ConversationState.Idle || conversationUiState.state == ConversationState.Error) {
+            if (
+                conversationUiState.state == ConversationState.Idle ||
+                conversationUiState.state == ConversationState.Error ||
+                conversationUiState.state == ConversationState.AwaitingUser
+            ) {
                 FilledIconButton(
                     enabled = !startRequested,
-                    onClick = { requestStart(retry = conversationUiState.state == ConversationState.Error) },
+                    onClick = {
+                        if (conversationUiState.state == ConversationState.AwaitingUser) {
+                            onResumeConversation(hasMicPermission())
+                        } else {
+                            requestStart(retry = conversationUiState.state == ConversationState.Error)
+                        }
+                    },
                     modifier = Modifier
                         .size(184.dp)
                         .shadow(24.dp, CircleShape)
                 ) {
-                    Text("PLAY", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                    Text(if (conversationUiState.state == ConversationState.AwaitingUser) "LISTEN" else "PLAY", fontSize = 28.sp, fontWeight = FontWeight.Bold)
                 }
             } else if (conversationUiState.state == ConversationState.Paused) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -307,6 +317,7 @@ private fun statusLabel(state: ConversationState): String {
     return when (state) {
         ConversationState.Idle -> "Assistant Ready"
         ConversationState.Listening -> "Listening..."
+        ConversationState.AwaitingUser -> "Ready"
         ConversationState.WaitingAI -> "Thinking..."
         ConversationState.Speaking -> "Speaking..."
         ConversationState.Paused -> "Paused"

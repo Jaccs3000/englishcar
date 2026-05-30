@@ -3,6 +3,7 @@ package com.englishcar.voicecoach.conversation
 enum class ConversationState {
     Idle,
     Listening,
+    AwaitingUser,
     WaitingAI,
     Speaking,
     Paused,

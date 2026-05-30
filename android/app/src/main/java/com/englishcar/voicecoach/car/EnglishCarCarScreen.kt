@@ -75,7 +75,8 @@ class EnglishCarCarScreen(
                 conversationManager.start(hasRecordAudioPermission = true)
                 invalidate()
             })
-            ConversationState.Paused -> {
+            ConversationState.Paused,
+            ConversationState.AwaitingUser -> {
                 builder.addAction(carAction("Resume") {
                     conversationManager.resume(hasRecordAudioPermission = true)
                     invalidate()
@@ -119,6 +120,7 @@ class EnglishCarCarScreen(
             when (state) {
                 ConversationState.Idle -> "Ready"
                 ConversationState.Listening -> "Listening"
+                ConversationState.AwaitingUser -> "Ready"
                 ConversationState.WaitingAI -> "Thinking"
                 ConversationState.Speaking -> "Speaking"
                 ConversationState.Paused -> "Paused"
@@ -132,6 +134,7 @@ class EnglishCarCarScreen(
         return CarText.create(
             when (state) {
                 ConversationState.Paused -> "Conversation is paused."
+                ConversationState.AwaitingUser -> "Tap Start when you want to speak."
                 ConversationState.Error -> "Use Start to retry."
                 else -> "Practice American English hands-free."
             }
