@@ -62,7 +62,6 @@ class ConversationManager @Inject constructor(
     private var currentAssistantTranscript = StringBuilder()
     private var lastCompletedUserText = ""
     private var muted = false
-    private var pausedRestartJob: Job? = null
 
     init {
         scope.launch {
@@ -89,6 +88,7 @@ class ConversationManager @Inject constructor(
             isSessionActive = true
             pausedCommandMode = false
             muted = false
+            geminiLiveClient.setPlaybackEnabled(true)
             currentUserTranscript.clear()
             currentAssistantTranscript.clear()
             lastCompletedUserText = ""
@@ -114,7 +114,7 @@ class ConversationManager @Inject constructor(
         pausedCommandMode = false
         inactivityJob?.cancel()
         finishJob?.cancel()
-        pausedRestartJob?.cancel()
+        geminiLiveClient.setPlaybackEnabled(true)
         geminiLiveClient.stop()
         audioFocusHandler.abandon()
         voiceSessionController.stop()
@@ -162,11 +162,9 @@ class ConversationManager @Inject constructor(
         pausedCommandMode = true
         inactivityJob?.cancel()
         finishJob?.cancel()
-        pausedRestartJob?.cancel()
-        geminiLiveClient.stop()
-        scope.launch {
-            geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
-        }
+        currentUserTranscript.clear()
+        currentAssistantTranscript.clear()
+        geminiLiveClient.setPlaybackEnabled(false)
         _uiState.update {
             it.copy(
                 state = ConversationState.Paused,
@@ -181,13 +179,11 @@ class ConversationManager @Inject constructor(
         if (muted) return
         diagnosticsLogger.add("Conversation", "pause interruption")
         pausedCommandMode = true
-        geminiLiveClient.stop()
         inactivityJob?.cancel()
         finishJob?.cancel()
-        pausedRestartJob?.cancel()
-        scope.launch {
-            geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
-        }
+        currentUserTranscript.clear()
+        currentAssistantTranscript.clear()
+        geminiLiveClient.setPlaybackEnabled(false)
         _uiState.update { it.copy(state = ConversationState.Paused, lastAssistantText = message, errorMessage = null) }
     }
 
@@ -202,8 +198,8 @@ class ConversationManager @Inject constructor(
             return
         }
         pausedCommandMode = false
-        pausedRestartJob?.cancel()
         muted = false
+        geminiLiveClient.setPlaybackEnabled(true)
         currentUserTranscript.clear()
         currentAssistantTranscript.clear()
         _uiState.update { it.copy(state = ConversationState.Listening, lastAssistantText = "I'm ready", errorMessage = null, isMuted = false) }
@@ -278,15 +274,7 @@ class ConversationManager @Inject constructor(
 
     private fun handleTurnComplete() {
         diagnosticsLogger.add("Conversation", "live turn complete")
-        if (pausedCommandMode && isSessionActive && !muted) {
-            pausedRestartJob?.cancel()
-            pausedRestartJob = scope.launch {
-                delay(250)
-                if (pausedCommandMode && isSessionActive && !muted) {
-                    diagnosticsLogger.add("Conversation", "paused command restart")
-                    geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
-                }
-            }
+        if (pausedCommandMode) {
             currentUserTranscript.clear()
             currentAssistantTranscript.clear()
             return
@@ -364,18 +352,6 @@ class ConversationManager @Inject constructor(
             "Never interrupt the user.",
             "Voice commands: pause=${settings.commands.pause}; resume=${settings.commands.resume}; finish=${settings.commands.finish}; close app=${settings.commands.closeApp}.",
             settings.userName.takeIf { it.isNotBlank() }?.let { "User name: $it." } ?: "User name: unknown."
-        ).joinToString("\n")
-    }
-
-    private suspend fun buildPausedCommandInstruction(): String {
-        val settings = settingsRepository.currentSettings()
-        return listOf(
-            "You are a silent voice-command detector for a paused hands-free app.",
-            "Do not have a conversation.",
-            "If the user says '${settings.commands.resume}', 'continue', 'resume', or 'start', respond with exactly: RESUME",
-            "If the user says '${settings.commands.finish}', respond with exactly: FINISH",
-            "If the user says '${settings.commands.closeApp}', respond with exactly: CLOSE_APP",
-            "For any other speech, noise, music, or unclear audio, respond with exactly: IGNORE"
         ).joinToString("\n")
     }
 

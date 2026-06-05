@@ -71,6 +71,8 @@ class GeminiLiveClient @Inject constructor(
     private var outboundRealtimeMessages = 0
     private var playbackQuietUntilMs = 0L
     private var activeSessionId = 0
+    private var captureStarting = false
+    private var playbackEnabled = true
 
     fun isAvailable(): Boolean {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
@@ -98,6 +100,8 @@ class GeminiLiveClient @Inject constructor(
         setupSent = false
         inboundMessages = 0
         outboundRealtimeMessages = 0
+        captureStarting = false
+        playbackEnabled = audioResponses
         activeSessionId += 1
         val sessionId = activeSessionId
         startPlayer()
@@ -115,7 +119,7 @@ class GeminiLiveClient @Inject constructor(
                     _events.tryEmit(GeminiLiveEvent.Connected)
                     scope.launch {
                         delay(350)
-                        if (running && captureAudio && recorder == null && sessionId == activeSessionId) {
+                        if (running && captureAudio && recorder == null && !captureStarting && sessionId == activeSessionId) {
                             diagnosticsLogger.add("GeminiLive", "start capture after setup wait")
                             startCapture()
                             _events.tryEmit(GeminiLiveEvent.Listening)
@@ -163,6 +167,7 @@ class GeminiLiveClient @Inject constructor(
             release()
         }
         recorder = null
+        captureStarting = false
         noiseSuppressor?.runCatching {
             enabled = false
             release()
@@ -186,6 +191,17 @@ class GeminiLiveClient @Inject constructor(
         webSocket?.runCatching { close(1000, "stop") }
         webSocket = null
         diagnosticsLogger.add("GeminiLive", "stop")
+    }
+
+    fun setPlaybackEnabled(enabled: Boolean) {
+        playbackEnabled = enabled
+        if (!enabled) {
+            player?.pause()
+            player?.flush()
+        } else {
+            player?.play()
+        }
+        diagnosticsLogger.add("GeminiLive", "playback enabled=$enabled")
     }
 
     private fun sendSetup(webSocket: WebSocket, model: String, systemInstruction: String, audioResponses: Boolean, voiceName: String) {
@@ -228,6 +244,11 @@ class GeminiLiveClient @Inject constructor(
 
     @SuppressLint("MissingPermission")
     private fun startCapture() {
+        if (captureStarting || recorder != null) {
+            diagnosticsLogger.add("GeminiLive", "capture start skipped starting=$captureStarting hasRecorder=${recorder != null}")
+            return
+        }
+        captureStarting = true
         captureJob = scope.launch {
             val sampleRate = 16_000
             val minBuffer = AudioRecord.getMinBufferSize(
@@ -249,12 +270,14 @@ class GeminiLiveClient @Inject constructor(
             )
             if (audioRecord.state != AudioRecord.STATE_INITIALIZED) {
                 diagnosticsLogger.add("GeminiLive", "AudioRecord not initialized")
+                captureStarting = false
                 _events.tryEmit(GeminiLiveEvent.Error("Audio recording error."))
                 return@launch
             }
             recorder = audioRecord
             enableAudioEffects(audioRecord)
             audioRecord.startRecording()
+            captureStarting = false
             diagnosticsLogger.add("GeminiLive", "capture start state=${audioRecord.recordingState} sampleRate=$sampleRate bufferSize=$bufferSize")
 
             val buffer = ByteArray(1600)
@@ -426,7 +449,7 @@ class GeminiLiveClient @Inject constructor(
             }
             if (root.has("setupComplete") || root.has("setup_complete")) {
                 diagnosticsLogger.add("GeminiLive", "setup complete message=$inboundMessages")
-                if (recorder == null) startCapture()
+                if (recorder == null && !captureStarting) startCapture()
                 _events.tryEmit(GeminiLiveEvent.Listening)
                 return
             }
@@ -459,8 +482,10 @@ class GeminiLiveClient @Inject constructor(
                         audioParts += 1
                         audioBytes += audio.size
                         val durationMs = ((audio.size / 2f) / 24_000 * 1000).toLong()
-                        playbackQuietUntilMs = maxOf(playbackQuietUntilMs, SystemClock.elapsedRealtime() + durationMs + 900)
-                        player?.write(audio, 0, audio.size)
+                        if (playbackEnabled) {
+                            playbackQuietUntilMs = maxOf(playbackQuietUntilMs, SystemClock.elapsedRealtime() + durationMs + 900)
+                            player?.write(audio, 0, audio.size)
+                        }
                     }
                 }
                 if (audioParts > 0) {
