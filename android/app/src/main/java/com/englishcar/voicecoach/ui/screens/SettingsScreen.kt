@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,6 +71,7 @@ fun SettingsScreen(
     onSaveSettings: (String, String, String, Int, Int, Int, CommandSettings, String) -> Unit,
     onPreviewAssistant: (String, String, Boolean) -> Unit,
     onPreviewVoice: (String) -> Unit,
+    onStopPreview: () -> Unit,
     onBack: () -> Unit
 ) {
     var userName by remember { mutableStateOf(settings.userName) }
@@ -124,7 +126,14 @@ fun SettingsScreen(
         closeAppCommand = settings.commands.closeApp
     }
 
-    BackHandler { onBack() }
+    DisposableEffect(Unit) {
+        onDispose { onStopPreview() }
+    }
+
+    BackHandler {
+        onStopPreview()
+        onBack()
+    }
 
     Box(
         modifier = Modifier

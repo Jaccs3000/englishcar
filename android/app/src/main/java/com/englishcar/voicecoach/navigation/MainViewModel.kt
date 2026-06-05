@@ -11,6 +11,7 @@ import com.englishcar.voicecoach.settings.SettingsRepository
 import com.englishcar.voicecoach.service.VoiceSessionController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +34,7 @@ class MainViewModel @Inject constructor(
     val diagnosticEvents = diagnosticsLogger.events
     private val _settingsLoaded = MutableStateFlow(false)
     val settingsLoaded: StateFlow<Boolean> = _settingsLoaded.asStateFlow()
+    private var previewActive = false
 
     init {
         viewModelScope.launch {
@@ -102,6 +104,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun previewGeminiVoice(voiceName: String) {
+        previewActive = true
         diagnosticsLogger.add("MainVM", "previewGeminiVoice voice=$voiceName")
         geminiLiveClient.start(
             systemInstruction = "You are previewing an American English coach voice. Say one natural sample sentence.",
@@ -110,6 +113,13 @@ class MainViewModel @Inject constructor(
             captureAudio = false,
             initialPrompt = "Say: Hello, I'm ready to practice American English with you. Let's keep it natural and clear."
         )
+    }
+
+    fun stopPreview() {
+        if (!previewActive) return
+        previewActive = false
+        diagnosticsLogger.add("MainVM", "stopPreview")
+        geminiLiveClient.stop()
     }
 
     fun startConversation(hasRecordAudioPermission: Boolean, source: String = "unknown") {
@@ -134,18 +144,23 @@ class MainViewModel @Inject constructor(
 
     fun closeApp() {
         diagnosticsLogger.add("MainVM", "closeApp source=home_exit")
-        conversationManager.finishWithGoodbye(closeApp = true)
-        voiceSessionController.stop()
+        viewModelScope.launch {
+            geminiLiveClient.start(
+                systemInstruction = "Say a very short goodbye.",
+                audioResponses = true,
+                voiceName = _settings.value.geminiVoice,
+                captureAudio = false,
+                initialPrompt = "Say exactly: See you later."
+            )
+            delay(1_700)
+            conversationManager.finishWithGoodbye(closeApp = true)
+            voiceSessionController.stop()
+        }
     }
 
     fun pauseConversation() {
         diagnosticsLogger.add("MainVM", "pauseConversation source=home_pause")
         conversationManager.pause(spoken = false)
-    }
-
-    fun setMuted(value: Boolean) {
-        diagnosticsLogger.add("MainVM", "setMuted value=$value")
-        conversationManager.setMuted(value)
     }
 
     fun resumeConversation(hasRecordAudioPermission: Boolean, source: String = "unknown") {

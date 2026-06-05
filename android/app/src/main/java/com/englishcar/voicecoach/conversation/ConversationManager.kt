@@ -62,6 +62,7 @@ class ConversationManager @Inject constructor(
     private var currentAssistantTranscript = StringBuilder()
     private var lastCompletedUserText = ""
     private var muted = false
+    private var pausedRestartJob: Job? = null
 
     init {
         scope.launch {
@@ -113,6 +114,7 @@ class ConversationManager @Inject constructor(
         pausedCommandMode = false
         inactivityJob?.cancel()
         finishJob?.cancel()
+        pausedRestartJob?.cancel()
         geminiLiveClient.stop()
         audioFocusHandler.abandon()
         voiceSessionController.stop()
@@ -160,6 +162,7 @@ class ConversationManager @Inject constructor(
         pausedCommandMode = true
         inactivityJob?.cancel()
         finishJob?.cancel()
+        pausedRestartJob?.cancel()
         geminiLiveClient.stop()
         scope.launch {
             geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
@@ -181,6 +184,7 @@ class ConversationManager @Inject constructor(
         geminiLiveClient.stop()
         inactivityJob?.cancel()
         finishJob?.cancel()
+        pausedRestartJob?.cancel()
         scope.launch {
             geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
         }
@@ -198,6 +202,7 @@ class ConversationManager @Inject constructor(
             return
         }
         pausedCommandMode = false
+        pausedRestartJob?.cancel()
         muted = false
         currentUserTranscript.clear()
         currentAssistantTranscript.clear()
@@ -273,6 +278,19 @@ class ConversationManager @Inject constructor(
 
     private fun handleTurnComplete() {
         diagnosticsLogger.add("Conversation", "live turn complete")
+        if (pausedCommandMode && isSessionActive && !muted) {
+            pausedRestartJob?.cancel()
+            pausedRestartJob = scope.launch {
+                delay(250)
+                if (pausedCommandMode && isSessionActive && !muted) {
+                    diagnosticsLogger.add("Conversation", "paused command restart")
+                    geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
+                }
+            }
+            currentUserTranscript.clear()
+            currentAssistantTranscript.clear()
+            return
+        }
         val userText = currentUserTranscript.toString().normalizeSpaces()
         val assistantText = currentAssistantTranscript.toString().normalizeSpaces()
         if (!pausedCommandMode && userText.isNotBlank()) {
@@ -426,7 +444,7 @@ class ConversationManager @Inject constructor(
     }
 
     private fun normalizeCommand(value: String): String {
-        return value.lowercase().replace(Regex("[^a-z0-9' ]"), " ").replace(Regex("\\s+"), " ").trim()
+        return value.lowercase().replace("'", "").replace(Regex("[^a-z0-9 ]"), " ").replace(Regex("\\s+"), " ").trim()
     }
 
     private fun String.normalizeSpaces(): String = replace(Regex("\\s+"), " ").trim()

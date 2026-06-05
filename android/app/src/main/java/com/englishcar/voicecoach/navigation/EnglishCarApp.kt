@@ -74,7 +74,6 @@ fun EnglishCarApp(
                 onStartConversation = { granted -> viewModel.startConversation(granted, source = "home_start") },
                 onFinishConversation = viewModel::finishConversation,
                 onPauseConversation = viewModel::pauseConversation,
-                onSetMuted = viewModel::setMuted,
                 onResumeConversation = { granted -> viewModel.resumeConversation(granted, source = "home_resume") },
                 onRetryConversation = { granted -> viewModel.retryConversation(granted, source = "home_retry") },
                 onOpenSettings = { navController.navigate(Routes.Settings) },
@@ -89,7 +88,11 @@ fun EnglishCarApp(
                 onSaveSettings = viewModel::saveSettings,
                 onPreviewAssistant = viewModel::previewAssistant,
                 onPreviewVoice = viewModel::previewGeminiVoice,
-                onBack = { navController.popBackStack() }
+                onStopPreview = viewModel::stopPreview,
+                onBack = {
+                    viewModel.stopPreview()
+                    navController.popBackStack()
+                }
             )
         }
         composable(Routes.Feedback) {
