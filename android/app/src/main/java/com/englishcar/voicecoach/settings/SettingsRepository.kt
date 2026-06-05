@@ -49,7 +49,7 @@ class SettingsRepository @Inject constructor(
             backendUrl = prefs[Keys.BackendUrl].orEmpty(),
             appApiToken = prefs[Keys.AppApiToken].orEmpty(),
             model = normalizeModel(prefs[Keys.Model]),
-            silenceTimeoutMs = (prefs[Keys.SilenceTimeoutMs] ?: 2400).coerceIn(900, 8000),
+            silenceTimeoutMs = (prefs[Keys.SilenceTimeoutMs] ?: 1600).coerceIn(900, 8000),
             autoPauseTimeoutMs = prefs[Keys.AutoPauseTimeoutMs] ?: 60_000,
             autoFinishTimeoutMs = prefs[Keys.AutoFinishTimeoutMs] ?: 600_000,
             commands = CommandSettings(

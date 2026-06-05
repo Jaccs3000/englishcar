@@ -87,8 +87,12 @@ app.post("/v1/transcribe", async (c) => {
   if (audioFile.size < 800) return c.json({ text: "" });
 
   try {
-    const audioBase64 = arrayBufferToBase64(await audioFile.arrayBuffer());
-    const response = await callGemini(c.env, getDefaultModel(c.env), [
+    const audioBuffer = await audioFile.arrayBuffer();
+    const workersAiText = await transcribeWithWorkersAi(c.env, audioBuffer);
+    if (workersAiText) return c.json({ text: workersAiText });
+
+    const audioBase64 = arrayBufferToBase64(audioBuffer);
+    const contents = [
       {
         role: "user",
         parts: [
@@ -102,8 +106,8 @@ app.post("/v1/transcribe", async (c) => {
           { inlineData: { mimeType: audioFile.type || "audio/wav", data: audioBase64 } }
         ]
       }
-    ]);
-    return c.json({ text: normalizeTranscriptText(extractGeminiText(response)) });
+    ];
+    return c.json({ text: await transcribeWithFallback(c.env, contents) });
   } catch (error) {
     console.warn("transcribe.error", { detail: safeThrowableDetails(error) });
     return c.json({ error: "Could not transcribe audio", code: "gemini_transcribe_error" }, 503);
@@ -139,20 +143,16 @@ function createConversationStream(env: Env, request: ConversationRequest): Reada
   return new ReadableStream({
     async start(controller) {
       try {
-        const finalResponse = env.GEMINI_API_KEY
-          ? await callGeminiConversation(env, request)
-          : buildFallbackResponse(request);
+        const finalResponse = await callConversationWithProviders(env, request);
 
         enqueueSse(controller, encoder, "delta", { text: finalResponse.spokenReply });
         enqueueSse(controller, encoder, "final", finalResponse);
       } catch (error) {
         const detail = safeThrowableDetails(error);
         console.warn("conversation.error", { detail });
-        enqueueSse(controller, encoder, "error", {
-          code: "conversation_response_error",
-          message: "The assistant is not available right now.",
-          details: detail
-        });
+        const fallbackResponse = buildFallbackResponse(request);
+        enqueueSse(controller, encoder, "delta", { text: fallbackResponse.spokenReply });
+        enqueueSse(controller, encoder, "final", fallbackResponse);
       } finally {
         controller.close();
       }
@@ -162,12 +162,55 @@ function createConversationStream(env: Env, request: ConversationRequest): Reada
 
 async function callGeminiConversation(env: Env, request: ConversationRequest): Promise<AiFinalResponse> {
   const prompt = buildPrompt(request);
-  const response = await callGemini(env, request.model, [{ role: "user", parts: [{ text: prompt }] }]);
+  const contents = [{ role: "user", parts: [{ text: prompt }] }];
+  const response = await callGeminiWithFallback(env, contents, request.model);
   const text = extractGeminiText(response);
   const parsedJson = parseJsonObject(text);
   const parsed = aiFinalResponseSchema.safeParse(parsedJson);
   if (!parsed.success) throw new Error("Gemini returned an invalid response shape.");
   return normalizeFeedback(parsed.data, request.userText ?? "");
+}
+
+async function callConversationWithProviders(env: Env, request: ConversationRequest): Promise<AiFinalResponse> {
+  if (env.GEMINI_API_KEY) {
+    try {
+      return await callGeminiConversation(env, request);
+    } catch (error) {
+      console.warn("conversation.gemini_failed", { detail: safeThrowableDetails(error) });
+    }
+  }
+
+  const workersAiResponse = await callWorkersAiConversation(env, request);
+  if (workersAiResponse) return workersAiResponse;
+
+  return buildFallbackResponse(request);
+}
+
+async function callWorkersAiConversation(env: Env, request: ConversationRequest): Promise<AiFinalResponse | null> {
+  if (!env.AI) return null;
+  try {
+    const prompt = buildPrompt(request);
+    const response = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+      messages: [
+        {
+          role: "system",
+          content: "You are an American English coach. Return valid compact JSON only."
+        },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.25,
+      max_tokens: 140
+    }) as { response?: unknown };
+    const text = typeof response.response === "string" ? response.response : "";
+    const parsedJson = parseJsonObject(text);
+    const parsed = aiFinalResponseSchema.safeParse(parsedJson);
+    if (!parsed.success) throw new Error("Workers AI returned an invalid response shape.");
+    console.warn("conversation.workers_ai.success", { chars: text.length });
+    return normalizeFeedback(parsed.data, request.userText ?? "");
+  } catch (error) {
+    console.warn("conversation.workers_ai_failed", { detail: safeThrowableDetails(error) });
+    return null;
+  }
 }
 
 async function callGemini(env: Env, model: string, contents: unknown[]) {
@@ -189,6 +232,57 @@ async function callGemini(env: Env, model: string, contents: unknown[]) {
   const text = await response.text();
   if (!response.ok) throw new Error(`Gemini error ${response.status}: ${text.slice(0, 180)}`);
   return JSON.parse(text);
+}
+
+async function callGeminiWithFallback(env: Env, contents: unknown[], preferredModel = getDefaultModel(env)) {
+  const orderedModels = [preferredModel, getDefaultModel(env), ...getAllowedModels(env)].filter(
+    (model, index, models) => models.indexOf(model) === index
+  );
+  let lastError: unknown;
+  for (const model of orderedModels) {
+    try {
+      return await callGemini(env, model, contents);
+    } catch (error) {
+      lastError = error;
+      console.warn("gemini.fallback", { model, detail: safeThrowableDetails(error) });
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Gemini fallback failed.");
+}
+
+async function transcribeWithFallback(env: Env, contents: unknown[]): Promise<string> {
+  const orderedModels = [getDefaultModel(env), ...getAllowedModels(env)].filter(
+    (model, index, models) => models.indexOf(model) === index
+  );
+  let lastError: unknown;
+  for (const model of orderedModels) {
+    try {
+      const response = await callGemini(env, model, contents);
+      const text = normalizeTranscriptText(extractGeminiText(response));
+      if (text) return text;
+      console.warn("transcribe.empty", { model });
+    } catch (error) {
+      lastError = error;
+      console.warn("transcribe.fallback", { model, detail: safeThrowableDetails(error) });
+    }
+  }
+  if (lastError) throw lastError instanceof Error ? lastError : new Error("Transcription fallback failed.");
+  return "";
+}
+
+async function transcribeWithWorkersAi(env: Env, audioBuffer: ArrayBuffer): Promise<string> {
+  if (!env.AI) return "";
+  try {
+    const response = await env.AI.run("@cf/openai/whisper", {
+      audio: [...new Uint8Array(audioBuffer)]
+    }) as { text?: unknown };
+    const text = typeof response.text === "string" ? response.text.trim() : "";
+    if (text) console.warn("transcribe.workers_ai.success", { chars: text.length });
+    return text;
+  } catch (error) {
+    console.warn("transcribe.workers_ai.error", { detail: safeThrowableDetails(error) });
+    return "";
+  }
 }
 
 function extractGeminiText(response: unknown): string {
@@ -306,7 +400,8 @@ function buildPrompt(request: ConversationRequest): string {
     "Do not save feedback when the only difference is punctuation or written formatting.",
     "If there is meaningful feedback, spokenReply must begin with one of these exact phrases:",
     correctionPhrases.join(" | "),
-    "Keep spokenReply brief: correction plus one short follow-up question when useful.",
+    "Keep spokenReply under 14 words when possible.",
+    "Do not add a follow-up question unless the user clearly asked to continue the topic.",
     "shortExplanation may be null when performance matters; correction and naturalAlternative are more important.",
     `Assistant name: ${request.assistantName}.`,
     `Assistant voice style: ${request.assistantPersonality}.`,
@@ -316,9 +411,47 @@ function buildPrompt(request: ConversationRequest): string {
   ].join("\n");
 }
 
-function buildFallbackResponse(request: ConversationRequest): AiFinalResponse {
+export function buildFallbackResponse(request: ConversationRequest): AiFinalResponse {
+  const userText = request.userText?.trim() ?? "";
+  if (request.type === "conversation_turn" && userText) {
+    return buildLocalFallbackForUserText(userText);
+  }
   return {
     spokenReply: request.type === "start_conversation" ? "I'm ready" : "Can you repeat, please?",
+    correction: null,
+    naturalAlternative: null,
+    shortExplanation: null,
+    shouldSaveFeedback: false
+  };
+}
+
+function buildLocalFallbackForUserText(userText: string): AiFinalResponse {
+  const normalized = normalizeMeaningText(userText);
+  const looksNonEnglish = /[áéíóúñ¿¡]/i.test(userText) ||
+    /\b(que|pero|dice|pantalla|aparece|repita|como|entienda|escucha|aplicaci[oó]n)\b/i.test(userText);
+
+  if (looksNonEnglish) {
+    return {
+      spokenReply: "I heard you. Please try that in English.",
+      correction: null,
+      naturalAlternative: null,
+      shortExplanation: null,
+      shouldSaveFeedback: false
+    };
+  }
+
+  if (normalized === "i am ready" || normalized === "im ready") {
+    return {
+      spokenReply: "Great. Let's continue.",
+      correction: null,
+      naturalAlternative: null,
+      shortExplanation: null,
+      shouldSaveFeedback: false
+    };
+  }
+
+  return {
+    spokenReply: "I heard you. Please continue.",
     correction: null,
     naturalAlternative: null,
     shortExplanation: null,

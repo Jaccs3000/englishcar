@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import app, { cleanFeedbackText, normalizeFeedback, normalizeTranscriptText } from "./index";
+import app, { buildFallbackResponse, cleanFeedbackText, normalizeFeedback, normalizeTranscriptText } from "./index";
 
 const env = {
   GEMINI_API_KEY: "",
@@ -63,5 +63,22 @@ describe("english car gemini backend", () => {
   it("normalizes Gemini transcription JSON shapes", () => {
     expect(normalizeTranscriptText("\"I am ready.\"")).toBe("I am ready.");
     expect(normalizeTranscriptText("{\"text\":\"I went home.\"}")).toBe("I went home.");
+  });
+
+  it("does not ask to repeat when fallback has user text", () => {
+    const fallback = buildFallbackResponse({
+      requestId: "test",
+      type: "conversation_turn",
+      userText: "Can you listen to me?",
+      assistantId: "female",
+      assistantName: "Isa",
+      assistantPersonality: "neutral",
+      userName: "Jesus",
+      model: "gemini-2.5-flash-lite",
+      locale: "en-US",
+      recentContext: []
+    });
+    expect(fallback.spokenReply).not.toBe("Can you repeat, please?");
+    expect(fallback.spokenReply).toContain("I heard you");
   });
 });

@@ -29,7 +29,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,7 +42,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.englishcar.voicecoach.navigation.ModelOptionsState
 import com.englishcar.voicecoach.settings.AppSettings
 import com.englishcar.voicecoach.settings.CommandSettings
 import kotlin.math.roundToInt
@@ -68,18 +66,13 @@ private val commandOptions = listOf(
 @Composable
 fun SettingsScreen(
     settings: AppSettings,
-    modelOptions: ModelOptionsState,
-    onSaveSettings: (String, String, String, String, Int, Int, Int, String, String, CommandSettings) -> Unit,
+    onSaveSettings: (String, String, String, Int, Int, Int, CommandSettings) -> Unit,
     onPreviewAssistant: (String, String, Boolean) -> Unit,
-    onRefreshModels: () -> Unit,
     onBack: () -> Unit
 ) {
-    var backendUrl by remember { mutableStateOf(settings.backendUrl) }
-    var token by remember { mutableStateOf(settings.appApiToken) }
     var userName by remember { mutableStateOf(settings.userName) }
     var assistantId by remember { mutableStateOf(settings.activeAssistantId) }
     var assistantName by remember { mutableStateOf(settings.assistantNames[assistantId].orEmpty()) }
-    var model by remember { mutableStateOf(settings.model) }
     var silenceTimeoutMs by remember { mutableStateOf(settings.silenceTimeoutMs) }
     var autoPauseTimeoutMs by remember { mutableStateOf(settings.autoPauseTimeoutMs) }
     var autoFinishTimeoutMs by remember { mutableStateOf(settings.autoFinishTimeoutMs) }
@@ -87,7 +80,6 @@ fun SettingsScreen(
     var resumeCommand by remember { mutableStateOf(settings.commands.resume) }
     var finishCommand by remember { mutableStateOf(settings.commands.finish) }
     var closeAppCommand by remember { mutableStateOf(settings.commands.closeApp) }
-    var backendExpanded by remember { mutableStateOf(false) }
     var selectedCommandId by remember { mutableStateOf("pause") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -111,17 +103,14 @@ fun SettingsScreen(
     }
     fun save() {
         val fixedAssistantName = if (assistantId == "male") "Alex" else "Isa"
-        onSaveSettings(userName, assistantId, fixedAssistantName, model, silenceTimeoutMs, autoPauseTimeoutMs, autoFinishTimeoutMs, backendUrl, token, commands())
+        onSaveSettings(userName, assistantId, fixedAssistantName, silenceTimeoutMs, autoPauseTimeoutMs, autoFinishTimeoutMs, commands())
         scope.launch { snackbarHostState.showSnackbar("Settings saved") }
     }
 
     LaunchedEffect(settings) {
-        backendUrl = settings.backendUrl
-        token = settings.appApiToken
         userName = settings.userName
         assistantId = settings.activeAssistantId
         assistantName = if (assistantId == "male") "Alex" else "Isa"
-        model = settings.model
         silenceTimeoutMs = settings.silenceTimeoutMs
         autoPauseTimeoutMs = settings.autoPauseTimeoutMs
         autoFinishTimeoutMs = settings.autoFinishTimeoutMs
@@ -165,18 +154,6 @@ fun SettingsScreen(
                 }
             }
 
-            SectionTitle("AI model")
-            Text(
-                when {
-                    modelOptions.isLoading -> "Loading models from backend..."
-                    modelOptions.errorMessage != null -> modelOptions.errorMessage
-                    else -> "Gemini free-tier friendly models."
-                },
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            DropdownField("AI model", model, modelOptions.models) { model = it }
-            TextButton(onClick = onRefreshModels) { Text("Refresh models") }
-
             SectionTitle("Turn timing")
             TimeSlider(silenceTimeoutMs, "Assistant waits ${formatDuration(silenceTimeoutMs)} of silence.", 900, 8_000, 100) { silenceTimeoutMs = it }
             TimeSlider(autoPauseTimeoutMs, "Ask to continue after ${formatDuration(autoPauseTimeoutMs)}.", 15_000, 600_000, 5_000) { autoPauseTimeoutMs = it }
@@ -202,14 +179,6 @@ fun SettingsScreen(
                 )
             }
 
-            TextButton(onClick = { backendExpanded = !backendExpanded }) {
-                Text(if (backendExpanded) "Hide backend" else "Show backend")
-            }
-            if (backendExpanded) {
-                SectionTitle("Backend")
-                SettingsField(backendUrl, { backendUrl = it }, "Worker URL")
-                SettingsField(token, { token = it }, "App API token")
-            }
         }
 
         Card(

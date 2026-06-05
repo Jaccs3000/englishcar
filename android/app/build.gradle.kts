@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -39,6 +41,30 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    val localProps = Properties().apply {
+        val rootLocal = rootProject.file("local.properties")
+        val backendEnv = rootProject.file("../backend/.env.local")
+        if (rootLocal.exists()) rootLocal.inputStream().use { load(it) }
+        if (backendEnv.exists()) {
+            backendEnv.readLines()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains("=") }
+                .forEach {
+                    val index = it.indexOf("=")
+                    if (!containsKey(it.substring(0, index).trim())) {
+                        put(it.substring(0, index).trim(), it.substring(index + 1).trim())
+                    }
+                }
+        }
+    }
+
+    defaultConfig {
+        buildConfigField("String", "GEMINI_API_KEY", "\"${(localProps["GEMINI_API_KEY"] ?: "").toString()}\"")
+        buildConfigField("String", "GEMINI_LIVE_MODEL", "\"${(localProps["GEMINI_LIVE_MODEL"] ?: "gemini-3.1-flash-live-preview").toString()}\"")
+        buildConfigField("String", "GEMINI_LIVE_VOICE", "\"${(localProps["GEMINI_LIVE_VOICE"] ?: "Kore").toString()}\"")
     }
 }
 
@@ -57,6 +83,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.car.app)
     implementation(libs.androidx.car.app.projected)
+    implementation(libs.okhttp)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 

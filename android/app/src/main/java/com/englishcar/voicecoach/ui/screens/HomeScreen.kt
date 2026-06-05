@@ -199,8 +199,9 @@ fun HomeScreen(
                 color = Color(0xFFC7D5DD),
                 style = MaterialTheme.typography.titleMedium
             )
-            if (conversationUiState.lastUserText.isNotBlank()) {
-                TranscriptLine(label = "You", text = conversationUiState.lastUserText)
+            val userDisplayText = conversationUiState.lastUserText.ifBlank { conversationUiState.userTextStatus }
+            if (userDisplayText.isNotBlank()) {
+                TranscriptLine(label = "You", text = userDisplayText)
             }
             if (conversationUiState.lastAssistantText.isNotBlank()) {
                 TranscriptLine(label = assistantName, text = conversationUiState.lastAssistantText)

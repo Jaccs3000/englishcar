@@ -2,9 +2,6 @@ package com.englishcar.voicecoach.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.englishcar.voicecoach.ai.BackendConversationClient
-import com.englishcar.voicecoach.ai.BackendException
-import com.englishcar.voicecoach.audio.TextToSpeechClient
 import com.englishcar.voicecoach.conversation.ConversationManager
 import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
 import com.englishcar.voicecoach.settings.AppSettings
@@ -23,8 +20,6 @@ import kotlinx.coroutines.launch
 class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val conversationManager: ConversationManager,
-    private val textToSpeechClient: TextToSpeechClient,
-    private val backendConversationClient: BackendConversationClient,
     private val voiceSessionController: VoiceSessionController,
     private val diagnosticsLogger: DiagnosticsLogger
 ) : ViewModel() {
@@ -36,13 +31,8 @@ class MainViewModel @Inject constructor(
     val diagnosticEvents = diagnosticsLogger.events
     private val _settingsLoaded = MutableStateFlow(false)
     val settingsLoaded: StateFlow<Boolean> = _settingsLoaded.asStateFlow()
-    private val _modelOptions = MutableStateFlow(ModelOptionsState())
-    val modelOptions: StateFlow<ModelOptionsState> = _modelOptions.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            textToSpeechClient.warmUp()
-        }
         viewModelScope.launch {
             settingsRepository.settings.collect { loadedSettings ->
                 _settings.value = loadedSettings
@@ -54,55 +44,6 @@ class MainViewModel @Inject constructor(
     fun completeFirstLaunch(userName: String, assistantId: String) {
         viewModelScope.launch {
             settingsRepository.completeFirstLaunch(userName, assistantId)
-        }
-    }
-
-    fun refreshModelOptions() {
-        viewModelScope.launch {
-            val current = settingsRepository.currentSettings()
-            if (current.backendUrl.isBlank() || current.appApiToken.isBlank()) {
-                _modelOptions.value = ModelOptionsState()
-                return@launch
-            }
-
-            _modelOptions.update { it.copy(isLoading = true, errorMessage = null) }
-            try {
-                val availableModels = backendConversationClient.fetchModels(
-                    backendUrl = current.backendUrl,
-                    appApiToken = current.appApiToken
-                )
-                val models = availableModels.models
-                    .filter { it.startsWith("gemini-") }
-                    .ifEmpty { ModelOptionsState.DefaultModels }
-                val defaultModel = availableModels.defaultModel
-                    .takeIf { it in models }
-                    ?: models.first()
-                _modelOptions.value = ModelOptionsState(
-                    models = models,
-                    defaultModel = defaultModel,
-                    isLoading = false,
-                    errorMessage = null
-                )
-                if (current.model !in models) {
-                    settingsRepository.saveModel(defaultModel)
-                }
-            } catch (error: Exception) {
-                _modelOptions.value = ModelOptionsState(
-                    isLoading = false,
-                    errorMessage = when (BackendException.fromThrowable(error)) {
-                        BackendException.InternetUnavailable -> "Could not load models: internet connection lost."
-                        BackendException.Timeout -> "Could not load models: request timed out."
-                        BackendException.Unauthorized -> "Could not load models: backend token is not valid."
-                        BackendException.BackendUnavailable -> "Could not load models from backend."
-                    }
-                )
-            }
-        }
-    }
-
-    fun saveBackendConfig(url: String, token: String) {
-        viewModelScope.launch {
-            settingsRepository.saveBackendConfig(url, token)
         }
     }
 
@@ -124,12 +65,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun saveModel(model: String) {
-        viewModelScope.launch {
-            settingsRepository.saveModel(model)
-        }
-    }
-
     fun saveSilenceTimeout(timeoutMs: Int) {
         viewModelScope.launch {
             settingsRepository.saveSilenceTimeout(timeoutMs)
@@ -140,40 +75,28 @@ class MainViewModel @Inject constructor(
         userName: String,
         assistantId: String,
         assistantName: String,
-        model: String,
         silenceTimeoutMs: Int,
         autoPauseTimeoutMs: Int,
         autoFinishTimeoutMs: Int,
-        backendUrl: String,
-        appApiToken: String,
         commands: CommandSettings
     ) {
         viewModelScope.launch {
             settingsRepository.saveUserName(userName)
             settingsRepository.saveActiveAssistant(assistantId)
             settingsRepository.saveAssistantName(assistantId, assistantName)
-            settingsRepository.saveModel(model)
             settingsRepository.saveSilenceTimeout(silenceTimeoutMs)
             settingsRepository.saveAutoPauseTimeout(autoPauseTimeoutMs)
             settingsRepository.saveAutoFinishTimeout(autoFinishTimeoutMs)
-            settingsRepository.saveBackendConfig(backendUrl, appApiToken)
             settingsRepository.saveCommands(commands)
         }
     }
 
     fun previewAssistant(assistantId: String, name: String, isMale: Boolean) {
-        viewModelScope.launch {
-            textToSpeechClient.stop()
-            textToSpeechClient.preview(
-                text = "Hi, my name is $name. I'll help you practice natural American English conversations while keeping things relaxed and easy to follow.",
-                assistantId = assistantId,
-                preferMale = isMale
-            )
-        }
+        diagnosticsLogger.add("MainVM", "previewAssistant skipped live assistant=$assistantId name=$name male=$isMale")
     }
 
-    fun startConversation(hasRecordAudioPermission: Boolean) {
-        diagnosticsLogger.add("MainVM", "startConversation permission=$hasRecordAudioPermission")
+    fun startConversation(hasRecordAudioPermission: Boolean, source: String = "unknown") {
+        diagnosticsLogger.add("MainVM", "startConversation source=$source permission=$hasRecordAudioPermission")
         runCatching {
             if (hasRecordAudioPermission) {
                 diagnosticsLogger.add("MainVM", "start service before conversation")
@@ -187,24 +110,29 @@ class MainViewModel @Inject constructor(
     }
 
     fun finishConversation() {
+        diagnosticsLogger.add("MainVM", "finishConversation source=home_finish")
         conversationManager.finish()
         voiceSessionController.stop()
     }
 
     fun closeApp() {
+        diagnosticsLogger.add("MainVM", "closeApp source=home_exit")
         conversationManager.finishWithGoodbye(closeApp = true)
         voiceSessionController.stop()
     }
 
     fun pauseConversation() {
+        diagnosticsLogger.add("MainVM", "pauseConversation source=home_pause")
         conversationManager.pause(spoken = false)
     }
 
-    fun resumeConversation(hasRecordAudioPermission: Boolean) {
+    fun resumeConversation(hasRecordAudioPermission: Boolean, source: String = "unknown") {
+        diagnosticsLogger.add("MainVM", "resumeConversation source=$source permission=$hasRecordAudioPermission")
         conversationManager.resume(hasRecordAudioPermission)
     }
 
-    fun retryConversation(hasRecordAudioPermission: Boolean) {
+    fun retryConversation(hasRecordAudioPermission: Boolean, source: String = "unknown") {
+        diagnosticsLogger.add("MainVM", "retryConversation source=$source permission=$hasRecordAudioPermission")
         if (hasRecordAudioPermission) {
             voiceSessionController.start()
         }
@@ -213,16 +141,5 @@ class MainViewModel @Inject constructor(
 
     fun clearDiagnostics() {
         diagnosticsLogger.clear()
-    }
-}
-
-data class ModelOptionsState(
-    val models: List<String> = DefaultModels,
-    val defaultModel: String = "gemini-2.5-flash-lite",
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null
-) {
-    companion object {
-        val DefaultModels = listOf("gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-2.0-flash", "gemini-2.5-flash")
     }
 }

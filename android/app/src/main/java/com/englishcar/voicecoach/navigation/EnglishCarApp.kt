@@ -37,7 +37,6 @@ fun EnglishCarApp(
     val settingsLoaded by viewModel.settingsLoaded.collectAsState()
     val conversationState by viewModel.conversationState.collectAsState()
     val diagnosticEvents by viewModel.diagnosticEvents.collectAsState()
-    val modelOptions by viewModel.modelOptions.collectAsState()
     val navController = rememberNavController()
     if (!settingsLoaded) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -72,11 +71,11 @@ fun EnglishCarApp(
                 assistantId = settings.activeAssistantId,
                 assistantName = settings.assistantNames[settings.activeAssistantId] ?: settings.activeAssistantId,
                 conversationUiState = conversationState,
-                onStartConversation = viewModel::startConversation,
+                onStartConversation = { granted -> viewModel.startConversation(granted, source = "home_start") },
                 onFinishConversation = viewModel::finishConversation,
                 onPauseConversation = viewModel::pauseConversation,
-                onResumeConversation = viewModel::resumeConversation,
-                onRetryConversation = viewModel::retryConversation,
+                onResumeConversation = { granted -> viewModel.resumeConversation(granted, source = "home_resume") },
+                onRetryConversation = { granted -> viewModel.retryConversation(granted, source = "home_retry") },
                 onOpenSettings = { navController.navigate(Routes.Settings) },
                 onOpenFeedback = { navController.navigate(Routes.Feedback) },
                 onOpenLogs = { navController.navigate(Routes.Logs) },
@@ -84,15 +83,10 @@ fun EnglishCarApp(
             )
         }
         composable(Routes.Settings) {
-            LaunchedEffect(settings.backendUrl, settings.appApiToken) {
-                viewModel.refreshModelOptions()
-            }
             SettingsScreen(
                 settings = settings,
-                modelOptions = modelOptions,
                 onSaveSettings = viewModel::saveSettings,
                 onPreviewAssistant = viewModel::previewAssistant,
-                onRefreshModels = viewModel::refreshModelOptions,
                 onBack = { navController.popBackStack() }
             )
         }

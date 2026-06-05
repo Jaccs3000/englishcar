@@ -18,7 +18,7 @@ data class AppSettings(
     val backendUrl: String = "",
     val appApiToken: String = "",
     val model: String = "gemini-2.5-flash-lite",
-    val silenceTimeoutMs: Int = 2400,
+    val silenceTimeoutMs: Int = 1600,
     val autoPauseTimeoutMs: Int = 60_000,
     val autoFinishTimeoutMs: Int = 600_000,
     val commands: CommandSettings = CommandSettings()

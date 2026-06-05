@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "live:smoke": "node scripts/gemini-live-smoke-test.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
@@ -14,6 +15,7 @@
   "license": "UNLICENSED",
   "description": "Personal Cloudflare Workers backend for English Car Coach",
   "dependencies": {
+    "@google/genai": "^2.8.0",
     "hono": "^4.12.22",
     "zod": "^4.4.3"
   },

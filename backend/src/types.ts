@@ -1,4 +1,5 @@
 export type Env = {
+  AI?: Ai;
   GEMINI_API_KEY: string;
   APP_API_TOKEN: string;
   ALLOWED_MODELS: string;

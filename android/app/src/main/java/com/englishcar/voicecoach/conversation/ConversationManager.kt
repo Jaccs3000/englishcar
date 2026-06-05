@@ -1,27 +1,14 @@
 package com.englishcar.voicecoach.conversation
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.SystemClock
 import android.util.Log
-import com.englishcar.voicecoach.ai.AiFinalResponse
 import com.englishcar.voicecoach.ai.AssistantCatalog
-import com.englishcar.voicecoach.ai.BackendConversationClient
-import com.englishcar.voicecoach.ai.BackendException
-import com.englishcar.voicecoach.ai.ContextTurn
-import com.englishcar.voicecoach.ai.ConversationRequest
 import com.englishcar.voicecoach.audio.AudioFocusHandler
-import com.englishcar.voicecoach.audio.SpeechEvent
-import com.englishcar.voicecoach.audio.SpeechRecognitionClient
-import com.englishcar.voicecoach.audio.TextToSpeechClient
+import com.englishcar.voicecoach.audio.GeminiLiveClient
+import com.englishcar.voicecoach.audio.GeminiLiveEvent
 import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
-import com.englishcar.voicecoach.history.FeedbackEntry
-import com.englishcar.voicecoach.history.FeedbackRepository
 import com.englishcar.voicecoach.service.VoiceSessionController
 import com.englishcar.voicecoach.settings.SettingsRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -38,25 +25,17 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 
 @Singleton
 class ConversationManager @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val speechRecognitionClient: SpeechRecognitionClient,
-    private val textToSpeechClient: TextToSpeechClient,
+    private val geminiLiveClient: GeminiLiveClient,
     private val audioFocusHandler: AudioFocusHandler,
     private val settingsRepository: SettingsRepository,
-    private val backendConversationClient: BackendConversationClient,
-    private val feedbackRepository: FeedbackRepository,
     private val voiceSessionController: VoiceSessionController,
     private val diagnosticsLogger: DiagnosticsLogger
 ) {
     private companion object {
         const val TAG = "EnglishCarConversation"
-        const val MAX_PAUSED_COMMAND_ATTEMPTS = 1
-        const val MIN_LISTEN_WINDOW_MS = 8_000L
-        const val MAX_SHORT_NO_MATCH_RETRIES = 3
     }
 
     private val exceptionHandler = CoroutineExceptionHandler { _, error ->
@@ -64,7 +43,6 @@ class ConversationManager @Inject constructor(
         _uiState.update { it.copy(state = ConversationState.Error, errorMessage = "Something went wrong.") }
     }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + exceptionHandler)
-    private val recentContext = ArrayDeque<ContextTurn>()
     private val _uiState = MutableStateFlow(ConversationUiState())
     val uiState: StateFlow<ConversationUiState> = _uiState.asStateFlow()
     private val _events = MutableSharedFlow<ConversationEvent>(extraBufferCapacity = 1)
@@ -72,56 +50,52 @@ class ConversationManager @Inject constructor(
 
     private var isSessionActive = false
     private var pausedCommandMode = false
-    private var pausedCommandListenAttempts = 0
-    private var currentSilenceTimeoutMs = 2400
     private var currentAutoPauseTimeoutMs = 60_000
     private var currentAutoFinishTimeoutMs = 600_000
     private var lastInteractionMs = 0L
     private var inactivityJob: Job? = null
     private var finishJob: Job? = null
-    private var conversationJob: Job? = null
-    private var generation = 0L
-    private var ignoreSpeechErrorsUntilMs = 0L
-    private var consecutiveNoMatchCount = 0
-    private var listenStartedAtMs = 0L
-    private var shortNoMatchRetries = 0
+    private var currentUserTranscript = StringBuilder()
+    private var currentAssistantTranscript = StringBuilder()
 
     init {
         scope.launch {
-            speechRecognitionClient.events.collect { handleSpeechEvent(it) }
+            geminiLiveClient.events.collect { handleGeminiEvent(it) }
         }
     }
 
     fun start(hasRecordAudioPermission: Boolean) {
-        diagnosticsLogger.add("Conversation", "start permission=$hasRecordAudioPermission")
+        diagnosticsLogger.add("Conversation", "start live permission=$hasRecordAudioPermission")
         if (!hasRecordAudioPermission) {
             _uiState.update { it.copy(state = ConversationState.Idle, isPermissionRequired = true, errorMessage = null) }
             return
         }
-        if (!speechRecognitionClient.isAvailable()) {
-            _uiState.update { it.copy(state = ConversationState.Error, errorMessage = "Microphone permission is missing.") }
+        if (!geminiLiveClient.isAvailable()) {
+            _uiState.update { it.copy(state = ConversationState.Error, errorMessage = "Gemini API key or microphone permission is missing.") }
             return
         }
 
-        generation += 1
-        val startGeneration = generation
         scope.launch {
-            if (generation != startGeneration) return@launch
             audioFocusHandler.request { pauseForInterruption("We can continue whenever you're ready.") }
             val settings = settingsRepository.currentSettings()
-            currentSilenceTimeoutMs = settings.silenceTimeoutMs
             currentAutoPauseTimeoutMs = settings.autoPauseTimeoutMs
             currentAutoFinishTimeoutMs = settings.autoFinishTimeoutMs
             isSessionActive = true
             pausedCommandMode = false
-            pausedCommandListenAttempts = 0
+            currentUserTranscript.clear()
+            currentAssistantTranscript.clear()
             lastInteractionMs = SystemClock.elapsedRealtime()
-            speakOnly("I'm ready")
-            if (generation == startGeneration && isSessionActive) {
-                listen(resetInactivityTimer = true)
-            } else {
-                diagnosticsLogger.add("Conversation", "start ignored stale generation=$startGeneration current=$generation")
+            voiceSessionController.start()
+            _uiState.update {
+                it.copy(
+                    state = ConversationState.Listening,
+                    lastAssistantText = "I'm ready",
+                    errorMessage = null,
+                    isPermissionRequired = false
+                )
             }
+            geminiLiveClient.start(buildSystemInstruction(), audioResponses = true)
+            scheduleTimers()
         }
     }
 
@@ -129,35 +103,21 @@ class ConversationManager @Inject constructor(
         diagnosticsLogger.add("Conversation", "finish")
         isSessionActive = false
         pausedCommandMode = false
-        generation += 1
-        conversationJob?.cancel()
-        conversationJob = null
         inactivityJob?.cancel()
         finishJob?.cancel()
-        speechRecognitionClient.stopListening()
-        textToSpeechClient.stop()
+        geminiLiveClient.stop()
         audioFocusHandler.abandon()
         voiceSessionController.stop()
-        recentContext.clear()
+        currentUserTranscript.clear()
+        currentAssistantTranscript.clear()
         _uiState.value = ConversationUiState()
     }
 
     fun finishWithGoodbye(closeApp: Boolean = false) {
-        if (!isSessionActive) {
-            if (closeApp) _events.tryEmit(ConversationEvent.CloseApp)
-            return
-        }
-        val finishGeneration = generation
-        speechRecognitionClient.stopListening()
-        scope.launch {
-            speakOnly("See you later.")
-            if (generation == finishGeneration) {
-                finish()
-                if (closeApp) _events.tryEmit(ConversationEvent.CloseApp)
-            } else {
-                diagnosticsLogger.add("Conversation", "finish ignored stale generation=$finishGeneration current=$generation")
-            }
-        }
+        diagnosticsLogger.add("Conversation", "finishWithGoodbye closeApp=$closeApp")
+        _uiState.update { it.copy(state = ConversationState.Speaking, lastAssistantText = "See you later.") }
+        finish()
+        if (closeApp) _events.tryEmit(ConversationEvent.CloseApp)
     }
 
     fun retry(hasRecordAudioPermission: Boolean) {
@@ -167,44 +127,38 @@ class ConversationManager @Inject constructor(
 
     fun pause(spoken: Boolean = false) {
         if (!isSessionActive) return
-        if (pausedCommandMode || _uiState.value.state == ConversationState.Paused) {
-            diagnosticsLogger.add("Conversation", "pause ignored already paused")
-            return
-        }
-        diagnosticsLogger.add("Conversation", "pause")
-        generation += 1
-        conversationJob?.cancel()
-        conversationJob = null
+        diagnosticsLogger.add("Conversation", "pause live spoken=$spoken")
+        pausedCommandMode = true
         inactivityJob?.cancel()
         finishJob?.cancel()
-        pausedCommandMode = true
-        pausedCommandListenAttempts = 0
-        ignoreSpeechErrorsUntilMs = SystemClock.elapsedRealtime() + 2_000L
-        speechRecognitionClient.stopListening()
-        textToSpeechClient.stop()
+        geminiLiveClient.stop()
         scope.launch {
-            _uiState.update { it.copy(state = ConversationState.Paused, errorMessage = null) }
-            if (spoken) {
-                speakOnly("Do you want to continue?")
-                if (isSessionActive && pausedCommandMode) listenForPausedCommand()
-            }
+            geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
+        }
+        _uiState.update {
+            it.copy(
+                state = ConversationState.Paused,
+                lastAssistantText = if (spoken) "Do you want to continue?" else it.lastAssistantText,
+                errorMessage = null
+            )
         }
     }
 
     fun pauseForInterruption(message: String = "We can continue whenever you're ready.") {
         if (!isSessionActive) return
-        speechRecognitionClient.stopListening()
-        textToSpeechClient.stop()
+        diagnosticsLogger.add("Conversation", "pause interruption")
+        pausedCommandMode = true
+        geminiLiveClient.stop()
         inactivityJob?.cancel()
         finishJob?.cancel()
-        generation += 1
-        conversationJob?.cancel()
-        conversationJob = null
-        pausedCommandMode = true
+        scope.launch {
+            geminiLiveClient.start(buildPausedCommandInstruction(), audioResponses = false)
+        }
         _uiState.update { it.copy(state = ConversationState.Paused, lastAssistantText = message, errorMessage = null) }
     }
 
     fun resume(hasRecordAudioPermission: Boolean) {
+        diagnosticsLogger.add("Conversation", "resume live permission=$hasRecordAudioPermission")
         if (!hasRecordAudioPermission) {
             _uiState.update { it.copy(isPermissionRequired = true) }
             return
@@ -213,93 +167,74 @@ class ConversationManager @Inject constructor(
             start(true)
             return
         }
-        scope.launch {
-            pausedCommandMode = false
-            speakThenListen("I'm ready", resetInactivityTimer = true)
-        }
-    }
-
-    private suspend fun speakThenListen(text: String, resetInactivityTimer: Boolean) {
-        speakOnly(text)
-        if (isSessionActive) listen(resetInactivityTimer)
-    }
-
-    private suspend fun speakOnly(text: String) {
-        val settings = settingsRepository.currentSettings()
-        val assistant = AssistantCatalog.find(settings.activeAssistantId)
-        _uiState.update { it.copy(state = ConversationState.Speaking, lastAssistantText = text, errorMessage = null) }
-        val spoken = withTimeoutOrNull(12_000L) {
-            textToSpeechClient.speakAsAssistant(text, assistant.id)
-        }
-        if (spoken == null) {
-            diagnosticsLogger.add("Conversation", "tts timed out; continue to listening")
-            textToSpeechClient.stop()
-        }
-    }
-
-    private fun listen(resetInactivityTimer: Boolean) {
-        if (resetInactivityTimer) lastInteractionMs = SystemClock.elapsedRealtime()
-        scheduleTimers()
         pausedCommandMode = false
-        pausedCommandListenAttempts = 0
-        listenStartedAtMs = SystemClock.elapsedRealtime()
-        _uiState.update { it.copy(state = ConversationState.Listening, errorMessage = null) }
-        speechRecognitionClient.startListening(currentSilenceTimeoutMs)
-    }
-
-    private fun listenForPausedCommand() {
-        pausedCommandMode = true
-        pausedCommandListenAttempts += 1
-        _uiState.update { it.copy(state = ConversationState.Paused, errorMessage = null) }
-        speechRecognitionClient.startListening(10_000)
-    }
-
-    private fun handleSpeechEvent(event: SpeechEvent) {
-        when (event) {
-            SpeechEvent.Ready -> Unit
-            SpeechEvent.EndOfSpeech -> Unit
-            is SpeechEvent.Result -> handleUserText(event.text)
-            is SpeechEvent.Error -> handleSpeechError(event.code)
+        currentUserTranscript.clear()
+        currentAssistantTranscript.clear()
+        _uiState.update { it.copy(state = ConversationState.Listening, lastAssistantText = "I'm ready", errorMessage = null) }
+        scope.launch {
+            geminiLiveClient.start(buildSystemInstruction(), audioResponses = true)
+            scheduleTimers()
         }
     }
 
-    private fun handleUserText(text: String) {
-        conversationJob?.cancel()
-        val turnGeneration = generation
-        conversationJob = scope.launch {
-            diagnosticsLogger.add("Conversation", "user text chars=${text.length} value=${text.take(120)}")
-            consecutiveNoMatchCount = 0
-            inactivityJob?.cancel()
-            finishJob?.cancel()
-            speechRecognitionClient.stopListening()
-            if (handleLocalCommand(text)) return@launch
-
-            if (pausedCommandMode || _uiState.value.state == ConversationState.Paused) {
-                diagnosticsLogger.add("Conversation", "paused ignored non-command text=${text.take(80)}")
-                pausedCommandMode = false
-                _uiState.update { it.copy(state = ConversationState.Paused, errorMessage = null) }
-                return@launch
-            }
-
-            lastInteractionMs = SystemClock.elapsedRealtime()
-            _uiState.update { it.copy(state = ConversationState.WaitingAI, lastUserText = text, errorMessage = null) }
-            if (!hasUsableNetwork()) {
-                speakOnly("Give me a moment, internet is slow.")
-                if (waitForNetwork()) {
-                    speakOnly("We can continue now.")
+    private fun handleGeminiEvent(event: GeminiLiveEvent) {
+        when (event) {
+            GeminiLiveEvent.Connected -> diagnosticsLogger.add("Conversation", "live connected")
+            GeminiLiveEvent.Listening -> {
+                if (isSessionActive && !pausedCommandMode) {
+                    _uiState.update { it.copy(state = ConversationState.Listening, errorMessage = null) }
                 }
             }
-            val response = requestAssistantReply("conversation_turn", text)
-            if (!isSessionActive || pausedCommandMode || generation != turnGeneration) {
-                diagnosticsLogger.add("Conversation", "turn ignored active=$isSessionActive paused=$pausedCommandMode generation=$generation turnGeneration=$turnGeneration")
-                return@launch
+            is GeminiLiveEvent.UserTranscript -> handleUserTranscript(event.text)
+            is GeminiLiveEvent.AssistantTranscript -> handleAssistantTranscript(event.text)
+            GeminiLiveEvent.TurnComplete -> handleTurnComplete()
+            is GeminiLiveEvent.Error -> {
+                _uiState.update { it.copy(state = ConversationState.Error, errorMessage = event.message) }
             }
-            speakOnly(response.spokenReply.ifBlank { "Can you repeat, please?" })
-            rememberContext("user", text)
-            rememberContext("assistant", response.spokenReply)
-            if (isSessionActive && !pausedCommandMode && generation == turnGeneration) {
-                listen(resetInactivityTimer = true)
+        }
+    }
+
+    private fun handleUserTranscript(text: String) {
+        if (!isSessionActive) return
+        currentUserTranscript.append(text)
+        val fullText = currentUserTranscript.toString().normalizeSpaces()
+        diagnosticsLogger.add("Conversation", "live user transcript chars=${fullText.length} value=${fullText.take(120)}")
+        if (!pausedCommandMode) {
+            _uiState.update { it.copy(lastUserText = fullText, userTextStatus = "") }
+        }
+        lastInteractionMs = SystemClock.elapsedRealtime()
+        if (!pausedCommandMode) scheduleTimers()
+        scope.launch {
+            val handledCommand = handleLocalCommand(fullText)
+            if (handledCommand || pausedCommandMode) currentUserTranscript.clear()
+        }
+    }
+
+    private fun handleAssistantTranscript(text: String) {
+        if (!isSessionActive) return
+        if (pausedCommandMode) {
+            scope.launch {
+                when (text.normalizeSpaces().uppercase()) {
+                    "RESUME" -> resume(true)
+                    "FINISH" -> finishWithGoodbye()
+                    "CLOSE_APP" -> finishWithGoodbye(closeApp = true)
+                    else -> diagnosticsLogger.add("Conversation", "paused assistant ignored value=${text.take(40)}")
+                }
             }
+            return
+        }
+        currentAssistantTranscript.append(text)
+        val fullText = currentAssistantTranscript.toString().normalizeSpaces()
+        diagnosticsLogger.add("Conversation", "live assistant transcript chars=${fullText.length} value=${fullText.take(120)}")
+        _uiState.update { it.copy(state = ConversationState.Speaking, lastAssistantText = fullText, errorMessage = null) }
+    }
+
+    private fun handleTurnComplete() {
+        diagnosticsLogger.add("Conversation", "live turn complete")
+        currentUserTranscript.clear()
+        currentAssistantTranscript.clear()
+        if (isSessionActive && !pausedCommandMode) {
+            _uiState.update { it.copy(state = ConversationState.Listening, errorMessage = null) }
         }
     }
 
@@ -331,8 +266,7 @@ class ConversationManager @Inject constructor(
                 true
             }
             LocalCommand.Resume -> {
-                pausedCommandMode = false
-                speakThenListen("I'm ready", resetInactivityTimer = true)
+                resume(true)
                 true
             }
             LocalCommand.Finish -> {
@@ -347,139 +281,36 @@ class ConversationManager @Inject constructor(
         }
     }
 
-    private suspend fun requestAssistantReply(type: String, userText: String?): AiFinalResponse {
+    private suspend fun buildSystemInstruction(): String {
         val settings = settingsRepository.currentSettings()
         val assistant = AssistantCatalog.find(settings.activeAssistantId)
         val assistantName = settings.assistantNames[assistant.id] ?: assistant.defaultName
-        if (settings.backendUrl.isBlank() || settings.appApiToken.isBlank()) return AiFinalResponse("Can you repeat, please?")
-        val model = when (settings.model) {
-            "gemini-2.5-flash",
-            "gemini-2.5-flash-lite",
-            "gemini-2.0-flash",
-            "gemini-2.0-flash-lite" -> settings.model
-            else -> "gemini-2.5-flash-lite"
-        }
-
-        suspend fun sendToBackend(): AiFinalResponse {
-            val response = backendConversationClient.send(
-                backendUrl = settings.backendUrl,
-                appApiToken = settings.appApiToken,
-                request = ConversationRequest(
-                    requestId = UUID.randomUUID().toString(),
-                    type = type,
-                    userText = userText,
-                    assistantId = assistant.id,
-                    assistantName = assistantName,
-                    assistantPersonality = assistant.personality,
-                    userName = settings.userName.ifBlank { null },
-                    model = model,
-                    recentContext = recentContext.toList()
-                )
-            )
-            saveFeedbackIfNeeded(type, userText, response, assistant.id, model)
-            return response
-        }
-
-        return try {
-            sendToBackend()
-        } catch (error: Exception) {
-            diagnosticsLogger.add("Conversation", "backend failed ${error.javaClass.simpleName}")
-            when (BackendException.fromThrowable(error)) {
-                BackendException.InternetUnavailable,
-                BackendException.Timeout -> {
-                    speakOnly("Give me a moment, internet is slow.")
-                    if (waitForNetwork()) {
-                        speakOnly("We can continue now.")
-                        runCatching { sendToBackend() }.getOrElse {
-                            diagnosticsLogger.add("Conversation", "backend retry failed ${it.javaClass.simpleName}")
-                            AiFinalResponse("Can you repeat, please?")
-                        }
-                    } else {
-                        AiFinalResponse("Can you repeat, please?")
-                    }
-                }
-                BackendException.BackendUnavailable -> AiFinalResponse("The assistant is not available right now.")
-                BackendException.Unauthorized -> AiFinalResponse("Backend token is not valid.")
-            }
-        }
+        return listOf(
+            "You are $assistantName, an American English conversation coach for a hands-free driving app.",
+            "Start the session by saying exactly: I'm ready.",
+            "Use American English. Speak calmly, clearly, neutrally, and didactically.",
+            "Correct only clear grammar, word-order, vocabulary, meaning, or pronunciation mistakes.",
+            "Do not correct punctuation, capitalization, commas, periods, or a missing question mark when spoken word order is correct.",
+            "When correcting, begin with one of these phrases: You should say: | A better way to say that is: | The correct form is: | More natural to say: | You can say: | The correct pronunciation is:",
+            "After a correction, continue the conversation naturally with a short sentence.",
+            "Keep replies short: usually under 18 words.",
+            "If you truly cannot understand the user, say exactly: Can you repeat, please?",
+            "Never interrupt the user.",
+            "Voice commands: pause=${settings.commands.pause}; resume=${settings.commands.resume}; finish=${settings.commands.finish}; close app=${settings.commands.closeApp}.",
+            settings.userName.takeIf { it.isNotBlank() }?.let { "User name: $it." } ?: "User name: unknown."
+        ).joinToString("\n")
     }
 
-    private suspend fun saveFeedbackIfNeeded(type: String, userText: String?, response: AiFinalResponse, assistantId: String, model: String) {
-        val correction = cleanFeedbackValue(response.correction)
-        val naturalAlternative = cleanFeedbackValue(response.naturalAlternative)
-        val shortExplanation = cleanFeedbackValue(response.shortExplanation)
-        val hasFeedback = correction != null || naturalAlternative != null || shortExplanation != null
-        if (type == "conversation_turn" && userText != null && (response.shouldSaveFeedback || hasFeedback)) {
-            feedbackRepository.save(
-                FeedbackEntry(
-                    originalPhrase = userText,
-                    correctedPhrase = correction,
-                    naturalAlternative = naturalAlternative,
-                    shortExplanation = shortExplanation,
-                    assistantId = assistantId,
-                    model = model,
-                    timestamp = System.currentTimeMillis()
-                )
-            )
-        }
-    }
-
-    private fun handleSpeechError(code: Int) {
-        if (SystemClock.elapsedRealtime() < ignoreSpeechErrorsUntilMs) return
-        if (pausedCommandMode || _uiState.value.state == ConversationState.Paused) {
-            diagnosticsLogger.add("Conversation", "paused command listen ended code=$code attempts=$pausedCommandListenAttempts")
-            pausedCommandMode = false
-            _uiState.update { it.copy(state = ConversationState.Paused, errorMessage = null) }
-            return
-        }
-        if (code == SpeechRecognitionClient.ERROR_NO_MATCH) {
-            scope.launch {
-                consecutiveNoMatchCount += 1
-                val listenedMs = SystemClock.elapsedRealtime() - listenStartedAtMs
-                if (listenedMs < MIN_LISTEN_WINDOW_MS && shortNoMatchRetries < MAX_SHORT_NO_MATCH_RETRIES) {
-                    shortNoMatchRetries += 1
-                    diagnosticsLogger.add("Conversation", "short no match listenedMs=$listenedMs retry=$shortNoMatchRetries")
-                    delay(400)
-                    if (isSessionActive && _uiState.value.state == ConversationState.Listening) {
-                        listen(resetInactivityTimer = false)
-                    }
-                    return@launch
-                }
-                shortNoMatchRetries = 0
-                diagnosticsLogger.add("Conversation", "no match count=$consecutiveNoMatchCount; awaiting user tap")
-                speechRecognitionClient.stopListening()
-                _uiState.update { it.copy(state = ConversationState.AwaitingUser, lastUserText = "", errorMessage = null) }
-            }
-            return
-        }
-        if (code == SpeechRecognitionClient.ERROR_TRANSCRIPTION_FAILED) {
-            scope.launch {
-                speakOnly("Can you repeat, please?")
-                if (isSessionActive) listen(resetInactivityTimer = false)
-            }
-            return
-        }
-        _uiState.update { it.copy(state = ConversationState.Error, errorMessage = speechErrorMessage(code)) }
-    }
-
-    private suspend fun waitForNetwork(): Boolean {
-        repeat(10) {
-            if (hasUsableNetwork()) return true
-            delay(1_500)
-        }
-        return false
-    }
-
-    private fun hasUsableNetwork(): Boolean {
-        val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = manager.activeNetwork ?: return false
-        val capabilities = manager.getNetworkCapabilities(network) ?: return false
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }
-
-    private fun rememberContext(role: String, text: String) {
-        recentContext.addLast(ContextTurn(role, text))
-        while (recentContext.size > 12) recentContext.removeFirst()
+    private suspend fun buildPausedCommandInstruction(): String {
+        val settings = settingsRepository.currentSettings()
+        return listOf(
+            "You are a silent voice-command detector for a paused hands-free app.",
+            "Do not have a conversation.",
+            "If the user says '${settings.commands.resume}', 'continue', 'resume', or 'start', respond with exactly: RESUME",
+            "If the user says '${settings.commands.finish}', respond with exactly: FINISH",
+            "If the user says '${settings.commands.closeApp}', respond with exactly: CLOSE_APP",
+            "For any other speech, noise, music, or unclear audio, respond with exactly: IGNORE"
+        ).joinToString("\n")
     }
 
     private fun matchCommand(text: String, pause: String, resume: String, finish: String, closeApp: String): LocalCommand? {
@@ -498,25 +329,7 @@ class ConversationManager @Inject constructor(
         return value.lowercase().replace(Regex("[^a-z0-9' ]"), " ").replace(Regex("\\s+"), " ").trim()
     }
 
-    private fun cleanFeedbackValue(value: String?): String? {
-        val cleaned = value?.trim()?.takeIf { it.isNotBlank() } ?: return null
-        val normalized = cleaned.lowercase().trim('.', ':', '-', ' ')
-        return when (normalized) {
-            "none", "no", "n/a", "na", "null", "ninguna", "ninguno", "no correction", "no corrections" -> null
-            else -> cleaned
-        }
-    }
-
-    private fun speechErrorMessage(code: Int): String {
-        return when (code) {
-            SpeechRecognitionClient.ERROR_AUDIO_RECORD -> "Audio recording error."
-            SpeechRecognitionClient.ERROR_PERMISSION -> "Microphone permission is missing."
-            SpeechRecognitionClient.ERROR_BACKEND_NOT_CONFIGURED -> "Backend is required."
-            SpeechRecognitionClient.ERROR_TRANSCRIPTION_FAILED -> "Can you repeat, please?"
-            SpeechRecognitionClient.ERROR_NO_MATCH -> "Can you repeat, please?"
-            else -> "Speech recognition failed with code $code."
-        }
-    }
+    private fun String.normalizeSpaces(): String = replace(Regex("\\s+"), " ").trim()
 
     private enum class LocalCommand { Pause, Resume, Finish, CloseApp }
 }
