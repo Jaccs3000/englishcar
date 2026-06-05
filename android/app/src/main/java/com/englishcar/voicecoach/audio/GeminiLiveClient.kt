@@ -70,13 +70,20 @@ class GeminiLiveClient @Inject constructor(
     private var inboundMessages = 0
     private var outboundRealtimeMessages = 0
     private var playbackQuietUntilMs = 0L
+    private var activeSessionId = 0
 
     fun isAvailable(): Boolean {
         return ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
             PackageManager.PERMISSION_GRANTED && BuildConfig.GEMINI_API_KEY.isNotBlank()
     }
 
-    fun start(systemInstruction: String, audioResponses: Boolean = true) {
+    fun start(
+        systemInstruction: String,
+        audioResponses: Boolean = true,
+        voiceName: String = BuildConfig.GEMINI_LIVE_VOICE.ifBlank { "Kore" },
+        captureAudio: Boolean = true,
+        initialPrompt: String? = if (audioResponses) "Say exactly: I'm ready." else null
+    ) {
         if (running) stop()
         if (BuildConfig.GEMINI_API_KEY.isBlank()) {
             _events.tryEmit(GeminiLiveEvent.Error("Gemini API key is missing."))
@@ -91,43 +98,54 @@ class GeminiLiveClient @Inject constructor(
         setupSent = false
         inboundMessages = 0
         outboundRealtimeMessages = 0
+        activeSessionId += 1
+        val sessionId = activeSessionId
         startPlayer()
         val model = BuildConfig.GEMINI_LIVE_MODEL.ifBlank { "gemini-3.1-flash-live-preview" }
         val url = "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${BuildConfig.GEMINI_API_KEY}"
-        diagnosticsLogger.add("GeminiLive", "connect model=$model voice=${BuildConfig.GEMINI_LIVE_VOICE} audioResponses=$audioResponses")
+        diagnosticsLogger.add("GeminiLive", "connect model=$model voice=$voiceName audioResponses=$audioResponses captureAudio=$captureAudio")
         val request = Request.Builder().url(url).build()
         webSocket = httpClient.newWebSocket(
             request,
             object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) {
+                    if (sessionId != activeSessionId) return
                     diagnosticsLogger.add("GeminiLive", "websocket open code=${response.code}")
-                    sendSetup(webSocket, model, systemInstruction, audioResponses)
+                    sendSetup(webSocket, model, systemInstruction, audioResponses, voiceName)
                     _events.tryEmit(GeminiLiveEvent.Connected)
                     scope.launch {
                         delay(350)
-                        if (running && recorder == null) {
+                        if (running && captureAudio && recorder == null && sessionId == activeSessionId) {
                             diagnosticsLogger.add("GeminiLive", "start capture after setup wait")
                             startCapture()
                             _events.tryEmit(GeminiLiveEvent.Listening)
+                        }
+                        if (running && initialPrompt != null && sessionId == activeSessionId) {
+                            diagnosticsLogger.add("GeminiLive", "initial prompt chars=${initialPrompt.length}")
+                            sendRealtimeInput(JSONObject().put("text", initialPrompt))
                         }
                     }
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
+                    if (sessionId != activeSessionId) return
                     handleMessage(text)
                 }
 
                 override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+                    if (sessionId != activeSessionId) return
                     handleMessage(bytes.utf8())
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                    if (sessionId != activeSessionId) return
                     diagnosticsLogger.add("GeminiLive", "websocket failed ${t.javaClass.simpleName} ${t.message.orEmpty().take(120)}")
                     _events.tryEmit(GeminiLiveEvent.Error("Gemini Live failed."))
                     stop()
                 }
 
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                    if (sessionId != activeSessionId) return
                     diagnosticsLogger.add("GeminiLive", "websocket closed code=$code reason=${reason.take(80)}")
                     stop()
                 }
@@ -136,6 +154,7 @@ class GeminiLiveClient @Inject constructor(
     }
 
     fun stop() {
+        activeSessionId += 1
         running = false
         captureJob?.cancel()
         captureJob = null
@@ -169,7 +188,7 @@ class GeminiLiveClient @Inject constructor(
         diagnosticsLogger.add("GeminiLive", "stop")
     }
 
-    private fun sendSetup(webSocket: WebSocket, model: String, systemInstruction: String, audioResponses: Boolean) {
+    private fun sendSetup(webSocket: WebSocket, model: String, systemInstruction: String, audioResponses: Boolean, voiceName: String) {
         if (setupSent) return
         setupSent = true
         val setup = JSONObject()
@@ -188,7 +207,7 @@ class GeminiLiveClient @Inject constructor(
                             "voiceConfig",
                             JSONObject().put(
                                 "prebuiltVoiceConfig",
-                                JSONObject().put("voiceName", BuildConfig.GEMINI_LIVE_VOICE.ifBlank { "Kore" })
+                                JSONObject().put("voiceName", voiceName.ifBlank { "Kore" })
                             )
                         )
                     )
@@ -204,7 +223,7 @@ class GeminiLiveClient @Inject constructor(
                 )
             )
         val sent = webSocket.send(JSONObject().put("setup", setup).toString())
-        diagnosticsLogger.add("GeminiLive", "setup sent ok=$sent vad=local audioResponses=$audioResponses voice=${BuildConfig.GEMINI_LIVE_VOICE.ifBlank { "Kore" }}")
+        diagnosticsLogger.add("GeminiLive", "setup sent ok=$sent vad=local audioResponses=$audioResponses voice=${voiceName.ifBlank { "Kore" }}")
     }
 
     @SuppressLint("MissingPermission")

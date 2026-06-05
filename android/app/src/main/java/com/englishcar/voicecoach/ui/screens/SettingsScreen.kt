@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.englishcar.voicecoach.settings.AppSettings
 import com.englishcar.voicecoach.settings.CommandSettings
+import com.englishcar.voicecoach.settings.geminiVoiceOptions
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
@@ -66,14 +67,16 @@ private val commandOptions = listOf(
 @Composable
 fun SettingsScreen(
     settings: AppSettings,
-    onSaveSettings: (String, String, String, Int, Int, Int, CommandSettings) -> Unit,
+    onSaveSettings: (String, String, String, Int, Int, Int, CommandSettings, String) -> Unit,
     onPreviewAssistant: (String, String, Boolean) -> Unit,
+    onPreviewVoice: (String) -> Unit,
     onBack: () -> Unit
 ) {
     var userName by remember { mutableStateOf(settings.userName) }
     var assistantId by remember { mutableStateOf(settings.activeAssistantId) }
     var assistantName by remember { mutableStateOf(settings.assistantNames[assistantId].orEmpty()) }
     var silenceTimeoutMs by remember { mutableStateOf(settings.silenceTimeoutMs) }
+    var geminiVoice by remember { mutableStateOf(settings.geminiVoice) }
     var autoPauseTimeoutMs by remember { mutableStateOf(settings.autoPauseTimeoutMs) }
     var autoFinishTimeoutMs by remember { mutableStateOf(settings.autoFinishTimeoutMs) }
     var pauseCommand by remember { mutableStateOf(settings.commands.pause) }
@@ -103,7 +106,7 @@ fun SettingsScreen(
     }
     fun save() {
         val fixedAssistantName = if (assistantId == "male") "Alex" else "Isa"
-        onSaveSettings(userName, assistantId, fixedAssistantName, silenceTimeoutMs, autoPauseTimeoutMs, autoFinishTimeoutMs, commands())
+        onSaveSettings(userName, assistantId, fixedAssistantName, silenceTimeoutMs, autoPauseTimeoutMs, autoFinishTimeoutMs, commands(), geminiVoice)
         scope.launch { snackbarHostState.showSnackbar("Settings saved") }
     }
 
@@ -112,6 +115,7 @@ fun SettingsScreen(
         assistantId = settings.activeAssistantId
         assistantName = if (assistantId == "male") "Alex" else "Isa"
         silenceTimeoutMs = settings.silenceTimeoutMs
+        geminiVoice = settings.geminiVoice
         autoPauseTimeoutMs = settings.autoPauseTimeoutMs
         autoFinishTimeoutMs = settings.autoFinishTimeoutMs
         pauseCommand = settings.commands.pause
@@ -154,8 +158,22 @@ fun SettingsScreen(
                 }
             }
 
+            SectionTitle("Gemini voices")
+            Text("Tap Play to hear a sample.", color = Color(0xFF9DAAB6), style = MaterialTheme.typography.bodyMedium)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                geminiVoiceOptions.forEach { voice ->
+                    SettingsChip(
+                        selected = geminiVoice == voice,
+                        text = "$voice Play",
+                        onClick = {
+                            geminiVoice = voice
+                            onPreviewVoice(voice)
+                        }
+                    )
+                }
+            }
+
             SectionTitle("Turn timing")
-            TimeSlider(silenceTimeoutMs, "Assistant waits ${formatDuration(silenceTimeoutMs)} of silence.", 900, 8_000, 100) { silenceTimeoutMs = it }
             TimeSlider(autoPauseTimeoutMs, "Ask to continue after ${formatDuration(autoPauseTimeoutMs)}.", 15_000, 600_000, 5_000) { autoPauseTimeoutMs = it }
             TimeSlider(autoFinishTimeoutMs, "Finish app after ${formatDuration(autoFinishTimeoutMs)} inactive.", 60_000, 1_800_000, 30_000) { autoFinishTimeoutMs = it }
 

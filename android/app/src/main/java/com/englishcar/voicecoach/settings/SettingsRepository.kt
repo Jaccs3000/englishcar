@@ -27,6 +27,7 @@ class SettingsRepository @Inject constructor(
         val AppApiToken = stringPreferencesKey("app_api_token")
         val Model = stringPreferencesKey("model")
         val SilenceTimeoutMs = intPreferencesKey("silence_timeout_ms")
+        val GeminiVoice = stringPreferencesKey("gemini_voice")
         val AutoPauseTimeoutMs = intPreferencesKey("auto_pause_timeout_ms")
         val AutoFinishTimeoutMs = intPreferencesKey("auto_finish_timeout_ms")
         val PauseCommand = stringPreferencesKey("command_pause")
@@ -46,6 +47,7 @@ class SettingsRepository @Inject constructor(
                 "female" to "Isa",
                 "male" to "Alex"
             ),
+            geminiVoice = normalizeGeminiVoice(prefs[Keys.GeminiVoice]),
             backendUrl = prefs[Keys.BackendUrl].orEmpty(),
             appApiToken = prefs[Keys.AppApiToken].orEmpty(),
             model = normalizeModel(prefs[Keys.Model]),
@@ -104,6 +106,12 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    suspend fun saveGeminiVoice(voice: String) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.GeminiVoice] = normalizeGeminiVoice(voice)
+        }
+    }
+
     suspend fun saveAutoPauseTimeout(timeoutMs: Int) {
         context.dataStore.edit { prefs ->
             prefs[Keys.AutoPauseTimeoutMs] = timeoutMs
@@ -158,6 +166,10 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    private fun normalizeGeminiVoice(value: String?): String {
+        return geminiVoiceOptions.firstOrNull { it.equals(value, ignoreCase = true) } ?: "Kore"
+    }
+
     private fun cleanCommand(value: String, fallback: String): String {
         return value.trim().replace(Regex("\\s+"), " ").ifBlank { fallback }
     }
@@ -171,3 +183,11 @@ class SettingsRepository @Inject constructor(
     }
 
 }
+
+val geminiVoiceOptions = listOf(
+    "Zephyr", "Puck", "Charon", "Kore", "Fenrir", "Leda", "Orus", "Aoede",
+    "Callirrhoe", "Autonoe", "Enceladus", "Iapetus", "Umbriel", "Algieba",
+    "Despina", "Erinome", "Algenib", "Rasalgethi", "Laomedeia", "Achernar",
+    "Alnilam", "Schedar", "Gacrux", "Pulcherrima", "Achird", "Zubenelgenubi",
+    "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat"
+)

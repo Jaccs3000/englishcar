@@ -2,6 +2,7 @@ package com.englishcar.voicecoach.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.englishcar.voicecoach.audio.GeminiLiveClient
 import com.englishcar.voicecoach.conversation.ConversationManager
 import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
 import com.englishcar.voicecoach.settings.AppSettings
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val conversationManager: ConversationManager,
+    private val geminiLiveClient: GeminiLiveClient,
     private val voiceSessionController: VoiceSessionController,
     private val diagnosticsLogger: DiagnosticsLogger
 ) : ViewModel() {
@@ -78,7 +80,8 @@ class MainViewModel @Inject constructor(
         silenceTimeoutMs: Int,
         autoPauseTimeoutMs: Int,
         autoFinishTimeoutMs: Int,
-        commands: CommandSettings
+        commands: CommandSettings,
+        geminiVoice: String
     ) {
         viewModelScope.launch {
             settingsRepository.saveUserName(userName)
@@ -88,11 +91,25 @@ class MainViewModel @Inject constructor(
             settingsRepository.saveAutoPauseTimeout(autoPauseTimeoutMs)
             settingsRepository.saveAutoFinishTimeout(autoFinishTimeoutMs)
             settingsRepository.saveCommands(commands)
+            settingsRepository.saveGeminiVoice(geminiVoice)
         }
     }
 
     fun previewAssistant(assistantId: String, name: String, isMale: Boolean) {
-        diagnosticsLogger.add("MainVM", "previewAssistant skipped live assistant=$assistantId name=$name male=$isMale")
+        val voice = _settings.value.geminiVoice
+        previewGeminiVoice(voice)
+        diagnosticsLogger.add("MainVM", "previewAssistant assistant=$assistantId name=$name male=$isMale voice=$voice")
+    }
+
+    fun previewGeminiVoice(voiceName: String) {
+        diagnosticsLogger.add("MainVM", "previewGeminiVoice voice=$voiceName")
+        geminiLiveClient.start(
+            systemInstruction = "You are previewing an American English coach voice. Say one natural sample sentence.",
+            audioResponses = true,
+            voiceName = voiceName,
+            captureAudio = false,
+            initialPrompt = "Say: Hello, I'm ready to practice American English with you. Let's keep it natural and clear."
+        )
     }
 
     fun startConversation(hasRecordAudioPermission: Boolean, source: String = "unknown") {
@@ -124,6 +141,11 @@ class MainViewModel @Inject constructor(
     fun pauseConversation() {
         diagnosticsLogger.add("MainVM", "pauseConversation source=home_pause")
         conversationManager.pause(spoken = false)
+    }
+
+    fun setMuted(value: Boolean) {
+        diagnosticsLogger.add("MainVM", "setMuted value=$value")
+        conversationManager.setMuted(value)
     }
 
     fun resumeConversation(hasRecordAudioPermission: Boolean, source: String = "unknown") {

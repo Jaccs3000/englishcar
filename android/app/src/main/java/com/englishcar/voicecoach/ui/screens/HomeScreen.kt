@@ -61,6 +61,7 @@ fun HomeScreen(
     onStartConversation: (Boolean) -> Unit,
     onFinishConversation: () -> Unit,
     onPauseConversation: () -> Unit,
+    onSetMuted: (Boolean) -> Unit,
     onResumeConversation: (Boolean) -> Unit,
     onRetryConversation: (Boolean) -> Unit,
     onOpenSettings: () -> Unit,
@@ -183,6 +184,12 @@ fun HomeScreen(
                 }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    FilledIconButton(
+                        onClick = { onSetMuted(!conversationUiState.isMuted) },
+                        modifier = Modifier.size(52.dp)
+                    ) {
+                        Text(if (conversationUiState.isMuted) "OFF" else "MIC", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    }
                     Button(
                         onClick = onPauseConversation,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)

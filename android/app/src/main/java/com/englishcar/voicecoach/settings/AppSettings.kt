@@ -15,6 +15,7 @@ data class AppSettings(
         "female" to "Isa",
         "male" to "Alex"
     ),
+    val geminiVoice: String = "Kore",
     val backendUrl: String = "",
     val appApiToken: String = "",
     val model: String = "gemini-2.5-flash-lite",

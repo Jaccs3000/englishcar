@@ -17,5 +17,6 @@ data class ConversationUiState(
     val userTextStatus: String = "",
     val lastAssistantText: String = "",
     val errorMessage: String? = null,
-    val isPermissionRequired: Boolean = false
+    val isPermissionRequired: Boolean = false,
+    val isMuted: Boolean = false
 )

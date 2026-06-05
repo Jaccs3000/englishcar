@@ -7,6 +7,8 @@ import com.englishcar.voicecoach.audio.AudioFocusHandler
 import com.englishcar.voicecoach.audio.GeminiLiveClient
 import com.englishcar.voicecoach.audio.GeminiLiveEvent
 import com.englishcar.voicecoach.diagnostics.DiagnosticsLogger
+import com.englishcar.voicecoach.history.FeedbackEntry
+import com.englishcar.voicecoach.history.FeedbackRepository
 import com.englishcar.voicecoach.service.VoiceSessionController
 import com.englishcar.voicecoach.settings.SettingsRepository
 import javax.inject.Inject
@@ -31,6 +33,7 @@ class ConversationManager @Inject constructor(
     private val geminiLiveClient: GeminiLiveClient,
     private val audioFocusHandler: AudioFocusHandler,
     private val settingsRepository: SettingsRepository,
+    private val feedbackRepository: FeedbackRepository,
     private val voiceSessionController: VoiceSessionController,
     private val diagnosticsLogger: DiagnosticsLogger
 ) {
@@ -57,6 +60,8 @@ class ConversationManager @Inject constructor(
     private var finishJob: Job? = null
     private var currentUserTranscript = StringBuilder()
     private var currentAssistantTranscript = StringBuilder()
+    private var lastCompletedUserText = ""
+    private var muted = false
 
     init {
         scope.launch {
@@ -82,8 +87,10 @@ class ConversationManager @Inject constructor(
             currentAutoFinishTimeoutMs = settings.autoFinishTimeoutMs
             isSessionActive = true
             pausedCommandMode = false
+            muted = false
             currentUserTranscript.clear()
             currentAssistantTranscript.clear()
+            lastCompletedUserText = ""
             lastInteractionMs = SystemClock.elapsedRealtime()
             voiceSessionController.start()
             _uiState.update {
@@ -91,10 +98,11 @@ class ConversationManager @Inject constructor(
                     state = ConversationState.Listening,
                     lastAssistantText = "I'm ready",
                     errorMessage = null,
-                    isPermissionRequired = false
+                    isPermissionRequired = false,
+                    isMuted = false
                 )
             }
-            geminiLiveClient.start(buildSystemInstruction(), audioResponses = true)
+            geminiLiveClient.start(buildSystemInstruction(), audioResponses = true, voiceName = settings.geminiVoice)
             scheduleTimers()
         }
     }
@@ -110,6 +118,8 @@ class ConversationManager @Inject constructor(
         voiceSessionController.stop()
         currentUserTranscript.clear()
         currentAssistantTranscript.clear()
+        lastCompletedUserText = ""
+        muted = false
         _uiState.value = ConversationUiState()
     }
 
@@ -120,6 +130,24 @@ class ConversationManager @Inject constructor(
         if (closeApp) _events.tryEmit(ConversationEvent.CloseApp)
     }
 
+    fun setMuted(value: Boolean) {
+        if (!isSessionActive) return
+        muted = value
+        diagnosticsLogger.add("Conversation", "mute changed muted=$muted")
+        if (muted) {
+            geminiLiveClient.stop()
+            _uiState.update { it.copy(isMuted = true, state = ConversationState.Paused, lastAssistantText = "Muted") }
+        } else {
+            pausedCommandMode = false
+            _uiState.update { it.copy(isMuted = false, state = ConversationState.Listening, lastAssistantText = "I'm ready") }
+            scope.launch {
+                val settings = settingsRepository.currentSettings()
+                geminiLiveClient.start(buildSystemInstruction(), audioResponses = true, voiceName = settings.geminiVoice)
+                scheduleTimers()
+            }
+        }
+    }
+
     fun retry(hasRecordAudioPermission: Boolean) {
         finish()
         start(hasRecordAudioPermission)
@@ -127,6 +155,7 @@ class ConversationManager @Inject constructor(
 
     fun pause(spoken: Boolean = false) {
         if (!isSessionActive) return
+        if (muted) return
         diagnosticsLogger.add("Conversation", "pause live spoken=$spoken")
         pausedCommandMode = true
         inactivityJob?.cancel()
@@ -146,6 +175,7 @@ class ConversationManager @Inject constructor(
 
     fun pauseForInterruption(message: String = "We can continue whenever you're ready.") {
         if (!isSessionActive) return
+        if (muted) return
         diagnosticsLogger.add("Conversation", "pause interruption")
         pausedCommandMode = true
         geminiLiveClient.stop()
@@ -168,11 +198,13 @@ class ConversationManager @Inject constructor(
             return
         }
         pausedCommandMode = false
+        muted = false
         currentUserTranscript.clear()
         currentAssistantTranscript.clear()
-        _uiState.update { it.copy(state = ConversationState.Listening, lastAssistantText = "I'm ready", errorMessage = null) }
+        _uiState.update { it.copy(state = ConversationState.Listening, lastAssistantText = "I'm ready", errorMessage = null, isMuted = false) }
         scope.launch {
-            geminiLiveClient.start(buildSystemInstruction(), audioResponses = true)
+            val settings = settingsRepository.currentSettings()
+            geminiLiveClient.start(buildSystemInstruction(), audioResponses = true, voiceName = settings.geminiVoice)
             scheduleTimers()
         }
     }
@@ -199,6 +231,16 @@ class ConversationManager @Inject constructor(
         currentUserTranscript.append(text)
         val fullText = currentUserTranscript.toString().normalizeSpaces()
         diagnosticsLogger.add("Conversation", "live user transcript chars=${fullText.length} value=${fullText.take(120)}")
+        if (pausedCommandMode) {
+            scope.launch {
+                if (handleLocalCommand(fullText) || matchPausedCommand(fullText) != null) {
+                    currentUserTranscript.clear()
+                } else {
+                    currentUserTranscript.clear()
+                }
+            }
+            return
+        }
         if (!pausedCommandMode) {
             _uiState.update { it.copy(lastUserText = fullText, userTextStatus = "") }
         }
@@ -231,6 +273,12 @@ class ConversationManager @Inject constructor(
 
     private fun handleTurnComplete() {
         diagnosticsLogger.add("Conversation", "live turn complete")
+        val userText = currentUserTranscript.toString().normalizeSpaces()
+        val assistantText = currentAssistantTranscript.toString().normalizeSpaces()
+        if (!pausedCommandMode && userText.isNotBlank()) {
+            lastCompletedUserText = userText
+            maybeSaveFeedback(userText, assistantText)
+        }
         currentUserTranscript.clear()
         currentAssistantTranscript.clear()
         if (isSessionActive && !pausedCommandMode) {
@@ -313,6 +361,54 @@ class ConversationManager @Inject constructor(
         ).joinToString("\n")
     }
 
+    private suspend fun matchPausedCommand(text: String): LocalCommand? {
+        val settings = settingsRepository.currentSettings()
+        val normalized = normalizeCommand(text)
+        val resume = normalizeCommand(settings.commands.resume)
+        val finish = normalizeCommand(settings.commands.finish)
+        val close = normalizeCommand(settings.commands.closeApp)
+        val command = when {
+            containsCommand(normalized, resume) || containsCommand(normalized, "continue") || containsCommand(normalized, "resume") || containsCommand(normalized, "start") -> LocalCommand.Resume
+            containsCommand(normalized, finish) || containsCommand(normalized, "finish") -> LocalCommand.Finish
+            containsCommand(normalized, close) || containsCommand(normalized, "bye bye") || containsCommand(normalized, "goodbye") || containsCommand(normalized, "see you later") -> LocalCommand.CloseApp
+            else -> null
+        }
+        diagnosticsLogger.add("Conversation", "paused command text=${text.take(80)} command=$command")
+        when (command) {
+            LocalCommand.Resume -> resume(true)
+            LocalCommand.Finish -> finishWithGoodbye()
+            LocalCommand.CloseApp -> finishWithGoodbye(closeApp = true)
+            else -> Unit
+        }
+        return command
+    }
+
+    private fun maybeSaveFeedback(userText: String, assistantText: String) {
+        val prefix = correctionPhrases.firstOrNull { assistantText.startsWith(it, ignoreCase = true) } ?: return
+        val correction = assistantText
+            .removePrefixIgnoreCase(prefix)
+            .substringBefore("?")
+            .substringBefore(". What")
+            .trim(' ', '.', ':', '"')
+            .takeIf { it.isNotBlank() && !it.equals(userText, ignoreCase = true) }
+        if (correction == null) return
+        scope.launch {
+            val settings = settingsRepository.currentSettings()
+            feedbackRepository.save(
+                FeedbackEntry(
+                    originalPhrase = userText,
+                    correctedPhrase = "$prefix $correction",
+                    naturalAlternative = null,
+                    shortExplanation = null,
+                    assistantId = settings.activeAssistantId,
+                    model = "gemini-3.1-flash-live-preview",
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+            diagnosticsLogger.add("Conversation", "feedback saved chars=${userText.length}")
+        }
+    }
+
     private fun matchCommand(text: String, pause: String, resume: String, finish: String, closeApp: String): LocalCommand? {
         val normalizedText = normalizeCommand(text)
         return listOf(
@@ -321,8 +417,12 @@ class ConversationManager @Inject constructor(
             LocalCommand.Finish to normalizeCommand(finish),
             LocalCommand.CloseApp to normalizeCommand(closeApp)
         ).firstOrNull { (_, command) ->
-            command.isNotBlank() && (normalizedText == command || normalizedText.contains(" $command ") || normalizedText.startsWith("$command ") || normalizedText.endsWith(" $command"))
+            containsCommand(normalizedText, command)
         }?.first
+    }
+
+    private fun containsCommand(normalizedText: String, command: String): Boolean {
+        return command.isNotBlank() && (normalizedText == command || normalizedText.contains(" $command ") || normalizedText.startsWith("$command ") || normalizedText.endsWith(" $command"))
     }
 
     private fun normalizeCommand(value: String): String {
@@ -330,6 +430,19 @@ class ConversationManager @Inject constructor(
     }
 
     private fun String.normalizeSpaces(): String = replace(Regex("\\s+"), " ").trim()
+
+    private fun String.removePrefixIgnoreCase(prefix: String): String {
+        return if (startsWith(prefix, ignoreCase = true)) substring(prefix.length) else this
+    }
+
+    private val correctionPhrases = listOf(
+        "You should say:",
+        "A better way to say that is:",
+        "The correct form is:",
+        "More natural to say:",
+        "You can say:",
+        "The correct pronunciation is:"
+    )
 
     private enum class LocalCommand { Pause, Resume, Finish, CloseApp }
 }
